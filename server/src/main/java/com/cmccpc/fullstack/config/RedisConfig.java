@@ -8,15 +8,14 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import com.cmccpc.fullstack.util.RedisUtil;
 
 /**
- * Redis 配置
+ * Redis 配置（业务需要缓存时直接注入 RedisTemplate 即可）
  * <p>
- * 启用条件（@ConditionalOnProperty，无 Bean 条件评估顺序问题）：
+ * 启用条件：
  * <ul>
- *   <li>生产：spring.data.redis.enabled 缺省视为 true，自动配置提供 RedisConnectionFactory → 本配置生效；</li>
- *   <li>测试：test profile 设置 spring.data.redis.enabled=false → 本配置跳过，不依赖 Redis。</li>
+ *   <li>默认：spring.data.redis.enabled 缺省为 true，提供 RedisConnectionFactory 时生效；</li>
+ *   <li>测试：spring.data.redis.enabled=false 时跳过，不依赖 Redis。</li>
  * </ul>
  */
 @Configuration
@@ -41,8 +40,4 @@ public class RedisConfig {
         return template;
     }
 
-    @Bean
-    public RedisUtil redisUtil(RedisTemplate<String, Object> redisTemplate) {
-        return new RedisUtil(redisTemplate);
-    }
 }

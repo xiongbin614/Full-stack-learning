@@ -9,13 +9,11 @@ import com.cmccpc.fullstack.dto.UserResponse;
 import com.cmccpc.fullstack.dto.UserUpdateRequest;
 import com.cmccpc.fullstack.entity.User;
 import com.cmccpc.fullstack.service.UserService;
-import com.cmccpc.fullstack.util.RedisUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,22 +27,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Duration;
 import java.util.List;
 
 /**
- * 用户管理接口（示例）
+ * 用户管理接口
  */
-@Tag(name = "用户管理", description = "用户 CRUD 示例接口")
+@Tag(name = "用户管理", description = "用户 CRUD")
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
 
-    private static final String USER_PAGE_CACHE_KEY = "cache:users:page:0:10";
-
     private final UserService userService;
-    private final ObjectProvider<RedisUtil> redisUtilProvider;
 
     @Operation(summary = "创建用户")
     @PostMapping
@@ -96,25 +90,6 @@ public class UserController {
                                       @Valid @RequestBody ResetPasswordRequest request) {
         userService.resetPassword(id, request.getPassword());
         return Result.success();
-    }
-
-    @Operation(summary = "演示 Redis 缓存（无 Redis 时直接查库）")
-    @GetMapping("/demo/cache")
-    public Result<List<UserResponse>> demoCache() {
-        RedisUtil redisUtil = redisUtilProvider.getIfAvailable();
-        if (redisUtil != null) {
-            @SuppressWarnings("unchecked")
-            List<UserResponse> cached = (List<UserResponse>) redisUtil.get(USER_PAGE_CACHE_KEY);
-            if (cached != null) {
-                return Result.success(cached);
-            }
-        }
-        List<UserResponse> users = userService.pageUsers(PageRequest.of(0, 10))
-                .getContent().stream().map(UserResponse::from).toList();
-        if (redisUtil != null) {
-            redisUtil.set(USER_PAGE_CACHE_KEY, users, Duration.ofMinutes(2));
-        }
-        return Result.success(users);
     }
 
 }

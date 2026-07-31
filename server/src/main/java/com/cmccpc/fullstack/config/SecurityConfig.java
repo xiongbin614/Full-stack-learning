@@ -45,7 +45,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/login",
-                                "/demo/info",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
@@ -53,8 +52,6 @@ public class SecurityConfig {
                                 "/actuator/info",
                                 "/h2-console/**"
                         ).permitAll()
-                        // Redis 演示需登录，避免匿名写缓存
-                        .requestMatchers("/demo/redis").authenticated()
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) ->

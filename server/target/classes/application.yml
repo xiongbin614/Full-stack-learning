@@ -39,7 +39,7 @@ spring:
         format_sql: true
     open-in-view: false
 
-  # ---------- Redis（本地无 Redis 时 demo/redis 会失败；核心业务不依赖） ----------
+  # ---------- Redis（可选；核心业务不依赖，本地无 Redis 时可设 spring.data.redis.enabled=false） ----------
   data:
     redis:
       host: ${REDIS_HOST:127.0.0.1}
@@ -94,10 +94,6 @@ logging:
 
 # ---------- 业务自定义配置 ----------
 cmccpc:
-  # JWT 预留：启用时请用环境变量注入，勿使用仓库默认值
-  jwt:
-    secret: ${JWT_SECRET:}
-    expire-seconds: 86400
   cors:
     # 多个域名用逗号分隔；开发可用 *
     allowed-origins: "*"

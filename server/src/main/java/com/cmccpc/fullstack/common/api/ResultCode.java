@@ -20,8 +20,7 @@ public enum ResultCode {
     // 业务异常段（业务模块可在此扩展）
     USER_NOT_FOUND(1001, "用户不存在"),
     USERNAME_EXISTS(1002, "用户名已存在"),
-    PASSWORD_ERROR(1003, "用户名或密码错误"),
-    ACCOUNT_LOCKED(1004, "账号已被锁定");
+    PASSWORD_ERROR(1003, "用户名或密码错误");
 
     private final long code;
     private final String message;

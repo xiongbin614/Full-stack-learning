@@ -45,13 +45,12 @@ com.cmccpc.fullstack
 ├── aspect/          # AOP
 ├── common/          # Result / 异常
 ├── config/
-├── controller/
+├── controller/      # Auth / User（共享扁平 API，暂不按 admin/pc 拆）
 ├── dto/
 ├── entity/
 ├── repository/
 ├── security/
-├── service/
-└── util/
+└── service/
 ```
 
 ## 快速开始
@@ -73,12 +72,10 @@ cd server
 mvn spring-boot:run
 
 # 验证
-curl http://localhost:8080/api/demo/info
 curl -c cookies.txt -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"admin123"}'
 curl -b cookies.txt http://localhost:8080/api/users
-curl -b cookies.txt "http://localhost:8080/api/demo/redis?key=hello&value=world"   # Redis 读写演示
 ```
 
 > 无本地 MySQL 时可切 H2 内存库：`mvn spring-boot:run -Dspring-boot.run.profiles=dev`（开箱即用，数据不持久）。
@@ -90,9 +87,7 @@ curl -b cookies.txt "http://localhost:8080/api/demo/redis?key=hello&value=world"
 | `http://localhost:8080/api/swagger-ui.html` | Swagger |
 | `http://localhost:8080/api/v3/api-docs` | OpenAPI |
 | `http://localhost:8080/api/actuator/health` | 健康检查 |
-| `http://localhost:8080/api/h2-console` | H2 控制台 |
-| `http://localhost:8080/api/demo/info` | 公开 Demo |
-| `http://localhost:8080/api/demo/redis` | Redis Demo |
+| `http://localhost:8080/api/h2-console` | H2 控制台（dev profile） |
 
 ### 切换 MySQL
 
@@ -117,10 +112,12 @@ mvn test   # test profile 使用 H2，且不启用 Redis（spring.data.redis.ena
 - Session 登录鉴权 + `role` 字段（ADMIN/USER）+ `@PreAuthorize`
 - 接口返回 `UserResponse`，不泄露密码哈希
 - AOP 请求日志脱敏
-- Redis 可选：无 Redis 时核心接口仍可启动；演示接口按需降级
+- Redis 可选：无 Redis 时核心接口仍可启动（`spring.data.redis.enabled=false`）
 - CORS 读取 `cmccpc.cors.allowed-origins`
 - 登出返回统一 JSON
 
 ## 扩展指引
 
-- JWT、完整 RBAC 表、Flyway、MQ 等见学习地图；按阶段往主线项目加能力即可。
+- 当前保持单体扁平 API（`/auth`、`/users`），admin / pc 共用同一后端。
+- 待 PC 业务域与 Admin RBAC（角色/权限/日志）落地后，再按包拆分：`auth` + `system` + `pc`，仍建议一个 Boot 应用。
+- JWT、Flyway、MQ 等见学习地图；按阶段往主线项目加能力即可。

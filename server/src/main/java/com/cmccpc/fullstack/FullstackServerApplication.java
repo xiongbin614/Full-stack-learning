@@ -6,10 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * CMCCPC Web 启动类
  * <p>
- * Spring Boot 全家桶基础项目，集成：Web / Data JPA / Security / Redis /
- * Validation / Mail / AOP / Actuator / OpenAPI(Swagger) / MySQL / H2 / Lombok
- *
- * @author cmccpc
+ * 集成：Web / Data JPA / Security / Redis / Validation / AOP /
+ * Actuator / OpenAPI(Swagger) / MySQL / H2 / Lombok
  */
 @SpringBootApplication
 public class FullstackServerApplication {
