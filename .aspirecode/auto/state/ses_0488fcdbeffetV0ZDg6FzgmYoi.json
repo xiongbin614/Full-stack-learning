@@ -1,0 +1,24 @@
+{
+  "session_id": "ses_0488fcdbeffetV0ZDg6FzgmYoi",
+  "task_id": "auto-ses_0488fcdbeffetV0ZDg6FzgmYoi",
+  "status": "finished",
+  "state": "done",
+  "task_type": "unknown",
+  "selected_agents": [],
+  "selected_models": {},
+  "route_cache": {},
+  "input_artifacts": [],
+  "handoff_artifacts": [],
+  "verification_artifacts": [],
+  "repair_round": 0,
+  "quality_contract": {
+    "target_map_required": true,
+    "completion_contract_required": true,
+    "verifier_required": true,
+    "quality_gate_required": true,
+    "max_repair_rounds": 2
+  },
+  "failures": [],
+  "final_status": "pass",
+  "updated_at": "2026-07-31T09:21:10.655Z"
+}
