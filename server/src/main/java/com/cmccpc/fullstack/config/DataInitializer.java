@@ -13,14 +13,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 /**
  * 开发环境数据初始化
  * <p>
- * 首次启动自动创建默认管理员账号（仅 dev profile）：
+ * 首次启动自动创建默认管理员账号（dev / mysql profile）：
  * 用户名 admin / 密码 admin123（启动后请立即修改）
  *
  * @author cmccpc
  */
 @Slf4j
 @Configuration
-@Profile("dev")
+@Profile({"dev", "mysql"})
 @RequiredArgsConstructor
 public class DataInitializer {
 

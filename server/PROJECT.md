@@ -13,7 +13,7 @@
 | Web | Spring Web (MVC) + Validation | ✅ |
 | 持久层 | Spring Data JPA（Hibernate 6） | ✅ |
 | 数据库 | MySQL 8（mysql profile）/ H2（dev 默认） | ✅ |
-| 缓存 | Spring Data Redis (Lettuce) | ✅ |
+| 缓存 | Spring Data Redis (Lettuce)，默认启用（`spring.data.redis.enabled` 可关） | ✅ |
 | 安全 | Spring Security（数据库用户 + BCrypt + Session） | ✅ |
 | 邮件 | Spring Mail | ❌ 已移除（未使用，需要时再加） |
 | AOP | Spring AOP（请求日志切面，敏感字段脱敏） | ✅ |
@@ -56,20 +56,32 @@ com.cmccpc.fullstack
 
 ## 快速开始
 
+> 默认（mysql profile）连接**本地 MySQL + Redis**，连接凭据从 `server/.env` 读取（gitignore，不入库）。
+> 模板：`cp .env.example .env`（或直接创建，格式见下）。
+
 ```bash
+# 1. 准备本地数据库（首次）
+mysql -u root -p -e "CREATE DATABASE cmccpc DEFAULT CHARACTER SET utf8mb4;"
+
+# 2. 配置本地连接凭据（server/.env，勿提交仓库）
+# MYSQL_HOST=127.0.0.1 / MYSQL_PORT=3306 / MYSQL_DATABASE=cmccpc
+# MYSQL_USERNAME=root / MYSQL_PASSWORD=你的密码
+# REDIS_HOST=127.0.0.1 / REDIS_PORT=6379 / REDIS_PASSWORD=你的密码
+
+# 3. 启动（自动建表 + 首次自动创建管理员 admin/admin123）
 cd server
 mvn spring-boot:run
 
 # 验证
 curl http://localhost:8080/api/demo/info
-
-# 登录（admin / admin123）
 curl -c cookies.txt -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"admin123"}'
-
 curl -b cookies.txt http://localhost:8080/api/users
+curl -b cookies.txt "http://localhost:8080/api/demo/redis?key=hello&value=world"   # Redis 读写演示
 ```
+
+> 无本地 MySQL 时可切 H2 内存库：`mvn spring-boot:run -Dspring-boot.run.profiles=dev`（开箱即用，数据不持久）。
 
 ### 常用地址
 
@@ -84,15 +96,18 @@ curl -b cookies.txt http://localhost:8080/api/users
 
 ### 切换 MySQL
 
+默认（mysql profile）即连接本地 MySQL。若需换库/换机：
+
 ```bash
-mysql -u root -p -e "CREATE DATABASE cmccpc DEFAULT CHARACTER SET utf8mb4;"
-MYSQL_USERNAME=root MYSQL_PASSWORD=yourpass mvn spring-boot:run -Dspring-boot.run.profiles=mysql
+# 数据库已存在：CREATE DATABASE cmccpc DEFAULT CHARACTER SET utf8mb4;
+# 凭据在 server/.env 修改，或环境变量覆盖（MYSQL_USERNAME/MYSQL_PASSWORD/...）
+mvn spring-boot:run -Dspring-boot.run.profiles=mysql
 ```
 
 ### 测试
 
 ```bash
-mvn test
+mvn test   # test profile 使用 H2，且不启用 Redis（spring.data.redis.enabled=false）
 ```
 
 ## 已实现能力

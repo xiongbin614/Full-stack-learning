@@ -10,9 +10,12 @@ server:
 spring:
   application:
     name: cmccpc-server
+  # 从本地 .env 加载 MySQL/Redis 连接凭据（gitignore，不入库）
+  config:
+    import: optional:file:./.env[.properties]
   profiles:
-    # 默认 dev 使用 H2；切换到 mysql 时指定 --spring.profiles.active=mysql
-    active: dev
+    # 默认连接本地 MySQL + Redis（mysql profile）；无本地 MySQL 时可切 dev（H2 内存库）
+    active: mysql
 
   # ---------- 数据源（dev profile 覆盖为 H2；mysql profile 覆盖为 MySQL） ----------
   datasource:

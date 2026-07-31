@@ -1,8 +1,6 @@
 package com.cmccpc.fullstack.util;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -12,10 +10,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Redis 操作工具类（仅在存在 RedisTemplate 时注册）
+ * Redis 操作工具类（由 RedisConfig 以 @Bean 注册，避免 @ConditionalOnBean 评估顺序问题）
  */
-@Component
-@ConditionalOnBean(name = "redisTemplate")
 public class RedisUtil {
 
     private final RedisTemplate<String, Object> redisTemplate;
