@@ -63,17 +63,17 @@ export const usePermissionStore = create<PermissionState>((set, get) => ({
   loaded: false,
 
   async load() {
-    // 后端 RBAC 未实现：先拉取 mock 权限并视为全部放行
-    const [permissions, roles] = await Promise.all([
+    // Mock 阶段：权限/角色/当前用户权限码均来自 Mock 接口；后端 RBAC 实现后无需改动
+    const [permissions, roles, codes] = await Promise.all([
       systemApi.getPermissions(),
       systemApi.getRoles(),
+      systemApi.getCurrentUserPermissions(),
     ])
     set({
       permissions,
       roles,
       menus: buildMenus(permissions),
-      // TODO: 后端返回当前用户角色后，按角色计算权限码集合
-      permissionCodes: permissions.map((p) => p.code),
+      permissionCodes: codes,
       loaded: true,
     })
   },

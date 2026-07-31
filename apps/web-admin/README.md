@@ -73,8 +73,44 @@
 
 ✅ **已初始化**（React 18 + Vite 7 + TypeScript + Ant Design 5 + React Router + Zustand + Axios）。
 
-- 已实现 P0：登录/退出、动态菜单布局、用户管理（对接 server 真实接口）、角色管理、权限管理（前端 mock，待 server RBAC）
-- 启动：`npm install && npm run dev`（dev server: http://localhost:5174 ，/api 代理到 http://localhost:8080）
-- 联调账号：admin / admin123（server dev 环境自动创建）
+- 已实现 P0：登录/退出、动态菜单布局、用户管理、角色管理、权限管理
+- 已实现 P1：操作日志（列表 / 关键字与模块筛选 / 分页）、工作台统计
+- 启动：`npm install && npm run dev`（dev server: http://localhost:5174）
 
-> 角色/权限接口当前为前端 mock，server 端 RBAC（Role/Permission 模型）实现后替换 `src/api/system.ts` 即可。
+### 当前阶段：前端 Mock（后端未实现）
+
+- 全部 `/api` 请求由 `mock/`（Vite 中间件插件）拦截并返回数据，**不联调后端**；
+- 响应结构沿用后端契约 `Result<T>` / `PageResult<T>`：`{ code, message, data, timestamp }`、分页 `{ list, total, pageNum, pageSize }`；
+- **接口契约 = 后端实现蓝本**：见 `mock/routes.ts` 顶部注释与路由表（URL、方法、请求、响应）。后端按该契约实现后，前端无需改动。
+
+### Mock 账号
+
+| 账号 | 密码 | 角色 | 权限 |
+|------|------|------|------|
+| `admin` | `admin123` | 管理员 | 全部权限（权限码 `*`） |
+| `alice` | `123456` | 运营人员 | 用户管理（不含角色/权限管理） |
+| `bob` | `123456` | 访客（已禁用示例） | 仅日志管理 |
+
+### 切换真实后端（联调）
+
+1. 将 `.env.development` 中 `VITE_USE_MOCK` 改为 `false`；
+2. 保持 `VITE_PROXY_TARGET=http://localhost:8080`（或改为实际后端地址）；
+3. 登录返回真实 token 后，调整 `src/store/authStore.ts` 的 `login()` 使用后端返回的 token（当前为 `mock-token-{username}` 占位）。
+
+### 目录结构
+
+```
+apps/web-admin/
+├── mock/                  # Mock 层（Vite 插件 + 内存数据 + 路由表 = 后端契约）
+│   ├── index.ts           # 插件入口：拦截 /api、Bearer 鉴权、写操作自动记日志
+│   ├── routes.ts          # 接口路由表与处理逻辑（auth/users/roles/permissions/logs/dashboard）
+│   └── db.ts              # 内存种子数据（用户/角色/权限/日志）
+└── src/
+    ├── api/               # 接口封装（auth/user/system）
+    ├── layouts/           # 主布局（动态菜单 + 顶栏）
+    ├── pages/             # login/dashboard/system(user|role|permission)/log/error
+    ├── router/            # 路由 + AuthGuard（登录守卫）
+    ├── store/             # Zustand（authStore/permissionStore）
+    ├── styles/            # 全局样式
+    └── types/             # 类型定义（对齐后端契约）
+```

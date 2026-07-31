@@ -49,6 +49,8 @@ export interface LoginRequest {
 export interface LoginResponse {
   username: string
   nickname?: string
+  /** ADMIN / USER（由角色推导，后端联调后返回） */
+  role?: 'ADMIN' | 'USER'
   message?: string
 }
 
@@ -93,4 +95,31 @@ export interface MenuItem {
   children?: MenuItem[]
   /** 关联权限码 */
   permission?: string
+}
+
+/** 操作日志（登录/操作日志，后端实现后对接 /logs） */
+export interface OperationLog {
+  id: number
+  /** 操作人用户名 */
+  operator: string
+  /** 模块，如：用户管理 */
+  module: string
+  /** 动作描述，如：创建用户 */
+  action: string
+  method: string
+  url: string
+  /** 0-失败 1-成功 */
+  status: number
+  ip: string
+  /** 耗时 ms */
+  cost: number
+  createTime: string
+}
+
+/** 工作台统计 */
+export interface DashboardStats {
+  userTotal: number
+  roleCount: number
+  permissionCount: number
+  todayLogs: number
 }

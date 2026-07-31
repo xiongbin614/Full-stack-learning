@@ -1,76 +1,64 @@
-import type { Role, Permission } from '@/types/user'
+import { http } from './request'
+import type { ApiPageResult } from '@/types/api'
+import type { DashboardStats, OperationLog, Permission, Role } from '@/types/user'
 
 /**
- * 角色 / 权限 API
+ * 角色 / 权限 / 日志 API
  *
- * ⚠️ 注意：server 后端暂未实现 RBAC（角色/权限）模型，以下接口使用内存 mock 数据，
- * 保证页面可完整演示。后端实现后，将下方函数体替换为 http 请求即可，签名不变。
+ * 当前阶段由 Mock（vite 插件拦截 /api）提供数据，接口契约即后端实现蓝本：
+ * 后端按 mock/routes.ts 中同路径、同请求、同响应结构实现即可，前端无需改动。
  */
-
-/** 模拟延迟，贴近真实请求 */
-function delay<T>(data: T, ms = 300): Promise<T> {
-  return new Promise((resolve) => setTimeout(() => resolve(structuredClone(data)), ms))
-}
-
-const mockRoles: Role[] = [
-  { id: 1, name: '超级管理员', code: 'ADMIN', description: '拥有全部权限', permissionIds: [], status: 1 },
-  { id: 2, name: '运营人员', code: 'OPERATOR', description: '管理用户与内容', permissionIds: [1, 2, 3, 4], status: 1 },
-  { id: 3, name: '访客', code: 'GUEST', description: '只读权限', permissionIds: [2], status: 1 },
-]
-
-const mockPermissions: Permission[] = [
-  { id: 1, parentId: 0, name: '系统管理', code: 'system', type: 'menu', path: '/system', icon: 'SettingOutlined', sort: 1 },
-  { id: 2, parentId: 1, name: '用户管理', code: 'system:user', type: 'menu', path: '/system/user', sort: 1 },
-  { id: 3, parentId: 2, name: '创建用户', code: 'system:user:create', type: 'perm', sort: 1 },
-  { id: 4, parentId: 2, name: '删除用户', code: 'system:user:delete', type: 'perm', sort: 2 },
-  { id: 5, parentId: 2, name: '重置密码', code: 'system:user:reset-password', type: 'perm', sort: 3 },
-  { id: 6, parentId: 1, name: '角色管理', code: 'system:role', type: 'menu', path: '/system/role', sort: 2 },
-  { id: 7, parentId: 1, name: '权限管理', code: 'system:permission', type: 'menu', path: '/system/permission', sort: 3 },
-  { id: 8, parentId: 0, name: '日志管理', code: 'log', type: 'menu', path: '/log', icon: 'FileTextOutlined', sort: 2 },
-]
 
 // ---------- 角色 ----------
 
 export function getRoles() {
-  return delay<Role[]>(mockRoles)
+  return http.get<Role[]>('/roles')
 }
 
 export function createRole(data: Omit<Role, 'id' | 'createTime'>) {
-  mockRoles.push({ ...data, id: Date.now() })
-  return delay<void>(undefined)
+  return http.post<void>('/roles', data)
 }
 
 export function updateRole(id: number, data: Partial<Role>) {
-  const idx = mockRoles.findIndex((r) => r.id === id)
-  if (idx >= 0) mockRoles[idx] = { ...mockRoles[idx], ...data }
-  return delay<void>(undefined)
+  return http.put<void>(`/roles/${id}`, data)
 }
 
 export function deleteRole(id: number) {
-  const idx = mockRoles.findIndex((r) => r.id === id)
-  if (idx >= 0) mockRoles.splice(idx, 1)
-  return delay<void>(undefined)
+  return http.delete<void>(`/roles/${id}`)
 }
 
 // ---------- 权限 ----------
 
 export function getPermissions() {
-  return delay<Permission[]>(mockPermissions)
+  return http.get<Permission[]>('/permissions')
 }
 
 export function createPermission(data: Omit<Permission, 'id'>) {
-  mockPermissions.push({ ...data, id: Date.now() })
-  return delay<void>(undefined)
+  return http.post<void>('/permissions', data)
 }
 
 export function updatePermission(id: number, data: Partial<Permission>) {
-  const idx = mockPermissions.findIndex((p) => p.id === id)
-  if (idx >= 0) mockPermissions[idx] = { ...mockPermissions[idx], ...data }
-  return delay<void>(undefined)
+  return http.put<void>(`/permissions/${id}`, data)
 }
 
 export function deletePermission(id: number) {
-  const idx = mockPermissions.findIndex((p) => p.id === id)
-  if (idx >= 0) mockPermissions.splice(idx, 1)
-  return delay<void>(undefined)
+  return http.delete<void>(`/permissions/${id}`)
+}
+
+// ---------- 当前用户权限码 ----------
+
+export function getCurrentUserPermissions() {
+  return http.get<string[]>('/auth/permissions')
+}
+
+// ---------- 操作日志 ----------
+
+export function getLogs(params: { page?: number; size?: number; keyword?: string; module?: string }) {
+  return http.get<ApiPageResult<OperationLog>>('/logs', { params })
+}
+
+// ---------- 工作台统计 ----------
+
+export function getDashboardStats() {
+  return http.get<DashboardStats>('/dashboard/stats')
 }
