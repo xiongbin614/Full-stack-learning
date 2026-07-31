@@ -1,0 +1,108 @@
+{
+  "session_id": "ses_04a0adc67ffeA88yIMBackEKqg",
+  "task_id": "auto-ses_04a0adc67ffeA88yIMBackEKqg",
+  "status": "finished",
+  "state": "planning",
+  "task_type": "unknown",
+  "selected_agents": [],
+  "selected_models": {},
+  "route_cache": {},
+  "input_artifacts": [
+    {
+      "fileName": "file:///Users/xiongbin/Desktop/Full-stack-learning/%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA%E8%B5%B7%E6%9D%A5%EF%BC%8C%E6%A0%B9%E6%8D%AE%E9%87%8C%E9%9D%A2%E7%9A%84README.md",
+      "fileType": "unknown",
+      "parser": "metadata-only",
+      "parseStatus": "unsupported",
+      "confidence": 0,
+      "warnings": [
+        "ENOENT: no such file or directory, open '/Users/xiongbin/Desktop/Full-stack-learning/项目搭建起来，根据里面的README.md'"
+      ],
+      "suggestedAgent": "ac-explore",
+      "suggestedModel": "LOW",
+      "contextDigest": "c0b66bfe7b41b853"
+    }
+  ],
+  "handoff_artifacts": [],
+  "verification_artifacts": [],
+  "repair_round": 0,
+  "quality_contract": {
+    "target_map_required": true,
+    "completion_contract_required": true,
+    "verifier_required": true,
+    "quality_gate_required": true,
+    "max_repair_rounds": 2
+  },
+  "failures": [],
+  "final_status": "pass",
+  "updated_at": "2026-07-31T08:21:58.209Z",
+  "manifest": {
+    "version": 1,
+    "generated_at": "2026-07-31T08:21:58.208Z",
+    "files": [
+      {
+        "name": "file:///Users/xiongbin/Desktop/Full-stack-learning/%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA%E8%B5%B7%E6%9D%A5%EF%BC%8C%E6%A0%B9%E6%8D%AE%E9%87%8C%E9%9D%A2%E7%9A%84README.md",
+        "size": 0,
+        "kind": "unknown",
+        "summary": "Unable to parse attachment locally.",
+        "truncated": false,
+        "native_multimodal": false,
+        "error": "ENOENT: no such file or directory, open '/Users/xiongbin/Desktop/Full-stack-learning/项目搭建起来，根据里面的README.md'",
+        "artifact": {
+          "fileName": "file:///Users/xiongbin/Desktop/Full-stack-learning/%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA%E8%B5%B7%E6%9D%A5%EF%BC%8C%E6%A0%B9%E6%8D%AE%E9%87%8C%E9%9D%A2%E7%9A%84README.md",
+          "fileType": "unknown",
+          "parser": "metadata-only",
+          "parseStatus": "unsupported",
+          "confidence": 0,
+          "warnings": [
+            "ENOENT: no such file or directory, open '/Users/xiongbin/Desktop/Full-stack-learning/项目搭建起来，根据里面的README.md'"
+          ],
+          "suggestedAgent": "ac-explore",
+          "suggestedModel": "LOW",
+          "contextDigest": "c0b66bfe7b41b853"
+        }
+      }
+    ],
+    "input_artifacts": [
+      {
+        "fileName": "file:///Users/xiongbin/Desktop/Full-stack-learning/%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA%E8%B5%B7%E6%9D%A5%EF%BC%8C%E6%A0%B9%E6%8D%AE%E9%87%8C%E9%9D%A2%E7%9A%84README.md",
+        "fileType": "unknown",
+        "parser": "metadata-only",
+        "parseStatus": "unsupported",
+        "confidence": 0,
+        "warnings": [
+          "ENOENT: no such file or directory, open '/Users/xiongbin/Desktop/Full-stack-learning/项目搭建起来，根据里面的README.md'"
+        ],
+        "suggestedAgent": "ac-explore",
+        "suggestedModel": "LOW",
+        "contextDigest": "c0b66bfe7b41b853"
+      }
+    ],
+    "summary": "file:///Users/xiongbin/Desktop/Full-stack-learning/%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA%E8%B5%B7%E6%9D%A5%EF%BC%8C%E6%A0%B9%E6%8D%AE%E9%87%8C%E9%9D%A2%E7%9A%84README.md: unknown, Unable to parse attachment locally.",
+    "has_multimodal": false,
+    "has_long_context": false,
+    "route_features": {
+      "input_type": "text",
+      "attachment_count": 1,
+      "attachment_mime_types": [],
+      "attachment_scanned": false,
+      "attachment_inline": true,
+      "requires_ocr": false,
+      "requires_vision": false,
+      "requires_multimodal_model": false,
+      "can_use_text_model_after_ocr": false,
+      "visual_intent": false,
+      "ocr_plugin_called": false,
+      "ocr_success": false,
+      "fallback_used": false
+    },
+    "total_text_chars": 0,
+    "truncated": false,
+    "context_digest": "c4c3a149c57f890c",
+    "errors": [
+      {
+        "file": "file:///Users/xiongbin/Desktop/Full-stack-learning/%E9%A1%B9%E7%9B%AE%E6%90%AD%E5%BB%BA%E8%B5%B7%E6%9D%A5%EF%BC%8C%E6%A0%B9%E6%8D%AE%E9%87%8C%E9%9D%A2%E7%9A%84README.md",
+        "message": "ENOENT: no such file or directory, open '/Users/xiongbin/Desktop/Full-stack-learning/项目搭建起来，根据里面的README.md'"
+      }
+    ]
+  }
+}
