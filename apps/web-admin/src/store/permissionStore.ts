@@ -31,6 +31,7 @@ function buildMenus(permissions: Permission[]): MenuItem[] {
     nodeMap.set(p.id, {
       key: p.path || String(p.id),
       label: p.name,
+      icon: p.icon,
       path: p.path,
       permission: p.code,
       children: [],

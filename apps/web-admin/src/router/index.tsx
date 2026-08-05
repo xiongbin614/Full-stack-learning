@@ -45,7 +45,7 @@ export const router = createBrowserRouter([
       {
         path: 'dashboard',
         element: lazyLoad(Dashboard),
-        handle: { title: '工作台' },
+        handle: { title: '首页' },
       },
       {
         path: 'system/user',

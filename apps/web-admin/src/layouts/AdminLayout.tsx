@@ -42,10 +42,11 @@ export default function AdminLayout() {
     () =>
       menus.map((m) => ({
         key: m.key,
-        icon: m.icon ? iconMap[m.icon] ?? iconMap[m.key] : undefined,
+        icon: m.icon ? iconMap[m.icon] : undefined,
         label: m.label,
         children: m.children?.map((c) => ({
           key: c.key,
+          icon: c.icon ? iconMap[c.icon] : undefined,
           label: c.label,
         })),
       })),
@@ -71,17 +72,18 @@ export default function AdminLayout() {
 
   const breadcrumbItems = useMemo(() => {
     const parts = location.pathname.split('/').filter(Boolean)
+    if (parts.length === 1 && parts[0] === 'dashboard') {
+      return [{ title: '首页' }]
+    }
     const items: { title: string }[] = [{ title: '首页' }]
     let current = ''
     for (const part of parts) {
       current += '/' + part
       const hit = menus.find((m) => m.key === current) || menus.find((m) => m.children?.some((c) => c.key === current))
       if (hit) {
-        items.push({ title: hit.children?.some((c) => c.key === current) ? hit.label : hit.label })
+        items.push({ title: hit.label })
         const child = hit.children?.find((c) => c.key === current)
         if (child) items.push({ title: child.label })
-      } else if (part === 'dashboard') {
-        items.push({ title: '工作台' })
       }
     }
     return items

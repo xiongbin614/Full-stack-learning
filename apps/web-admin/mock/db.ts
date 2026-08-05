@@ -116,7 +116,7 @@ export const roles: MockRole[] = [
     name: '超级管理员',
     code: 'ADMIN',
     description: '拥有全部权限，不可删除',
-    permissionIds: [1, 2, 3, 4, 5, 6, 7, 8],
+    permissionIds: [9, 1, 2, 3, 4, 5, 6, 7, 8],
     status: 1,
     createTime: '2026-01-01T09:00:00',
   },
@@ -125,7 +125,7 @@ export const roles: MockRole[] = [
     name: '运营人员',
     code: 'OPERATOR',
     description: '管理用户与内容',
-    permissionIds: [1, 2, 3, 4, 8],
+    permissionIds: [9, 1, 2, 3, 4, 8],
     status: 1,
     createTime: '2026-01-10T11:00:00',
   },
@@ -134,20 +134,21 @@ export const roles: MockRole[] = [
     name: '访客',
     code: 'GUEST',
     description: '只读权限',
-    permissionIds: [8],
+    permissionIds: [9, 8],
     status: 1,
     createTime: '2026-02-01T16:00:00',
   },
 ]
 
 export const permissions: MockPermission[] = [
+  { id: 9, parentId: 0, name: '首页', code: 'dashboard', type: 'menu', path: '/dashboard', icon: 'DashboardOutlined', sort: 0 },
   { id: 1, parentId: 0, name: '系统管理', code: 'system', type: 'menu', path: '/system', icon: 'SettingOutlined', sort: 1 },
-  { id: 2, parentId: 1, name: '用户管理', code: 'system:user', type: 'menu', path: '/system/user', sort: 1 },
+  { id: 2, parentId: 1, name: '用户管理', code: 'system:user', type: 'menu', path: '/system/user', icon: 'UserOutlined', sort: 1 },
   { id: 3, parentId: 2, name: '创建用户', code: 'system:user:create', type: 'perm', sort: 1 },
   { id: 4, parentId: 2, name: '删除用户', code: 'system:user:delete', type: 'perm', sort: 2 },
   { id: 5, parentId: 2, name: '重置密码', code: 'system:user:reset-password', type: 'perm', sort: 3 },
-  { id: 6, parentId: 1, name: '角色管理', code: 'system:role', type: 'menu', path: '/system/role', sort: 2 },
-  { id: 7, parentId: 1, name: '权限管理', code: 'system:permission', type: 'menu', path: '/system/permission', sort: 3 },
+  { id: 6, parentId: 1, name: '角色管理', code: 'system:role', type: 'menu', path: '/system/role', icon: 'TeamOutlined', sort: 2 },
+  { id: 7, parentId: 1, name: '权限管理', code: 'system:permission', type: 'menu', path: '/system/permission', icon: 'KeyOutlined', sort: 3 },
   { id: 8, parentId: 0, name: '日志管理', code: 'log', type: 'menu', path: '/log', icon: 'FileTextOutlined', sort: 2 },
 ]
 
