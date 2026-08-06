@@ -5,3 +5,8 @@ dist-ssr
 *.tsbuildinfo
 .DS_Store
 npm-debug.log*
+
+# 编辑器 / 系统
+.idea
+.vscode/*
+!.vscode/extensions.json

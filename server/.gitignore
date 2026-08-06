@@ -1,6 +1,12 @@
 # 本地敏感配置（连接凭据），不入库
 .env
+.env.*
+!.env.example
 *.local
 
 # 编译产物
 target/
+
+# IDE（与根目录规则双保险）
+.idea/
+*.iml
