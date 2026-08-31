@@ -1,10 +1,32 @@
 server:
   port: 8888
+
+spring:
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password:           # 无密码可留空
+      database: 0
+      timeout: 5s
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
 knife4j:
   enable: true
   setting:
-    language: zh_cn   # 中文UI
+    language: zh_cn
     enable-footer: false
+  # 接口文档访问账号密码（打开 /doc.html 时弹出）
+  # basic:
+  #   enable: true
+  #   username: admin
+  #   password: 123456
+
 springdoc:
   api-docs:
     enabled: true

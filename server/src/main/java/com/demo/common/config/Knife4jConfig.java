@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Knife4j / OpenAPI 文档配置。
  * <p>
- * 启动后访问：http://localhost:8080/doc.html
+ * 启动后访问：http://localhost:8888/doc.html（账号密码见 application.yml knife4j.basic）
  */
 @Configuration
 public class Knife4jConfig {
