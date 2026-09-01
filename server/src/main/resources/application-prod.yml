@@ -1,0 +1,22 @@
+# 生产
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+    enable-footer: false
+  basic:
+    enable: true
+    username: ${KNIFE4J_USERNAME}
+    password: ${KNIFE4J_PASSWORD}
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: false
+
+logging:
+  level:
+    root: warn
+    com.demo: info
+    com.demo.**.mapper: warn
