@@ -12,7 +12,7 @@ import com.demo.service.UserService;
 import com.demo.vo.UserVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -21,9 +21,8 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private static final BCryptPasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
-
     private final SysUserMapper sysUserMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public IPage<UserVO> page(UserQuery query) {
@@ -61,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
         SysUser user = new SysUser();
         BeanUtils.copyProperties(dto, user);
-        user.setPassword(PASSWORD_ENCODER.encode(dto.getPassword()));
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         if (user.getGender() == null) {
             user.setGender(0);
         }
