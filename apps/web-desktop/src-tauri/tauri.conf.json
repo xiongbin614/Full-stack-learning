@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "web_desktop",
+  "productName": "web-desktop",
   "version": "0.1.0",
-  "identifier": "com.xiongbin.web_desktop",
+  "identifier": "com.xiongbin.web-desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -12,9 +12,12 @@
   "app": {
     "windows": [
       {
-        "title": "web_desktop",
-        "width": 800,
-        "height": 600
+        "title": "墨言",
+        "width": 1200,
+        "height": 800,
+        "minWidth": 960,
+        "minHeight": 640,
+        "center": true
       }
     ],
     "security": {
