@@ -1,5 +1,15 @@
-# 生产环境（后续按需补充）
+# 生产环境
 logging:
   level:
     root: warn
     com.demo: info
+
+# 生产默认关闭文档页，避免对外暴露接口清单
+knife4j:
+  enable: false
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
