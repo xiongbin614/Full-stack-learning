@@ -29,6 +29,12 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- 参数校验：@Valid / @NotBlank 等 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
         <!-- 简化实体样板代码（@Data / @Getter 等），学到实体层再多用 -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -52,7 +58,6 @@
 
         <!--
           后续按学习进度自行添加，例如：
-          - spring-boot-starter-validation
           - spring-boot-starter-data-redis
           - mybatis-plus-spring-boot3-starter + mysql-connector-j + flyway
           - spring-security-crypto
