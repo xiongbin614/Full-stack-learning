@@ -3,7 +3,7 @@ package com.demo.common.result;
 import lombok.Data;
 
 /**
- * 统一接口响应体。
+ * 统一接口响应体（空架子预留，学到 Controller 时再用）。
  *
  * <pre>
  * { "code": 200, "msg": "success", "data": ... }

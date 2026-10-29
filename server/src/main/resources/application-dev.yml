@@ -1,24 +1,4 @@
-# 本地 / 联调
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
-knife4j:
-  enable: true
-  setting:
-    language: zh_cn
-    enable-footer: false
-  basic:
-    enable: true
-    username: ${KNIFE4J_USERNAME:admin}
-    password: ${KNIFE4J_PASSWORD:change-me}
-
-springdoc:
-  api-docs:
-    enabled: true
-  swagger-ui:
-    enabled: true
-
+# 本地开发环境（后续按需补充）
 logging:
   level:
     root: info
