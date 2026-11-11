@@ -32,7 +32,7 @@ export default function DashboardPage() {
         <p style={{ color: '#666' }}>
           当前时间：{dayjs().format('YYYY年MM月DD日 HH:mm:ss')}
           &nbsp;&nbsp;<Tag color="green">系统运行正常</Tag>
-          &nbsp;&nbsp;<Tag color="cyan">Mock 数据</Tag>
+          &nbsp;&nbsp;<Tag color="cyan">真实后端</Tag>
         </p>
       </Card>
 

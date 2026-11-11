@@ -30,8 +30,8 @@ export const useAuthStore = create<AuthState>()(
 
       async login(params) {
         const user = await authApi.login(params)
-        // Mock 阶段：token 格式 mock-token-{username}（联调后端后改为后端返回的 token）
-        const token = `mock-token-${user.username}`
+        // 后端尚未发 JWT：先用本地占位 token，请求头仍带 Authorization 方便后续接鉴权
+        const token = `dev-token-${user.username}`
         localStorage.setItem(TOKEN_KEY, token)
         set({ user, isLoggedIn: true, token })
         return user
@@ -59,10 +59,9 @@ export const useAuthStore = create<AuthState>()(
         isLoggedIn: state.isLoggedIn,
         token: state.token,
       }),
-      // 刷新页面后：恢复登录态并从 token 缺失时从用户名重建（Mock 阶段 token 可推导）
       onRehydrateStorage: () => (state) => {
         if (state?.isLoggedIn && state.user) {
-          const token = state.token || `mock-token-${state.user.username}`
+          const token = state.token || `dev-token-${state.user.username}`
           if (!state.token) state.token = token
           localStorage.setItem(TOKEN_KEY, token)
         }
