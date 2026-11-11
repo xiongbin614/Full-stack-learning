@@ -26,11 +26,12 @@ export default defineConfig(async ({ mode }) => {
       port: 5174,
       host: true,
       proxy: {
-        // 代理到 server 后端（Spring Boot，context-path=/api）。
-        // 注意：mock 中间件优先于代理生效，useMock=true 时不会真正转发。
+        // 代理到 server 后端。前端 baseURL=/api，后端无 context-path（/auth/...），
+        // 所以要把前缀 /api 剥掉再转发。mock 开启时中间件优先，不会走到这里。
         '/api': {
-          target: env.VITE_PROXY_TARGET || 'http://localhost:8080',
+          target: env.VITE_PROXY_TARGET || 'http://localhost:8888',
           changeOrigin: true,
+          rewrite: (path: string) => path.replace(/^\/api/, ''),
         },
       },
     },

@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
  * 把校验失败等异常转成统一 Result，否则前端/文档里往往只看到 400 没有清晰文案。
+ * <p>
+ * 只拦截业务 Controller，避免把 Knife4j / springdoc 自己的异常也收成 Result。
  */
 @Slf4j
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.demo.controller")
 public class GlobalExceptionHandler {
 
     /** @Valid + @RequestBody 校验失败（字段为空等） */

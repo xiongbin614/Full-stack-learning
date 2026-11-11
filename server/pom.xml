@@ -49,11 +49,22 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- 接口文档：Knife4j（OpenAPI3 + Jakarta，适配 Spring Boot 3） -->
+        <!-- 接口文档：Knife4j UI；排除自带旧 springdoc，改用与 Boot 3.5 兼容的版本 -->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
             <version>4.5.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springdoc</groupId>
+                    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.8.13</version>
         </dependency>
 
         <!-- MySQL：驱动 + MyBatis-Plus（后续写 Entity/Mapper 直接用） -->
