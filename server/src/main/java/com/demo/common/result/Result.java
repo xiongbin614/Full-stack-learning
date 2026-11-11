@@ -3,11 +3,8 @@ package com.demo.common.result;
 import lombok.Data;
 
 /**
- * 统一接口响应体（空架子预留，学到 Controller 时再用）。
- *
- * <pre>
- * { "code": 200, "msg": "success", "data": ... }
- * </pre>
+ * 统一接口响应体，与前端 ApiResult 对齐：
+ * { "code": 200, "message": "success", "data": ..., "timestamp": ... }
  */
 @Data
 public class Result<T> {
@@ -20,16 +17,18 @@ public class Result<T> {
     public static final int CODE_NOT_FOUND = 404;
 
     private int code;
-    private String msg;
+    private String message;
     private T data;
+    private long timestamp;
 
     private Result() {
     }
 
-    private Result(int code, String msg, T data) {
+    private Result(int code, String message, T data) {
         this.code = code;
-        this.msg = msg;
+        this.message = message;
         this.data = data;
+        this.timestamp = System.currentTimeMillis();
     }
 
     public static <T> Result<T> ok() {
@@ -40,15 +39,15 @@ public class Result<T> {
         return new Result<>(CODE_OK, "success", data);
     }
 
-    public static <T> Result<T> ok(T data, String msg) {
-        return new Result<>(CODE_OK, msg, data);
+    public static <T> Result<T> ok(T data, String message) {
+        return new Result<>(CODE_OK, message, data);
     }
 
-    public static <T> Result<T> fail(String msg) {
-        return fail(CODE_FAIL, msg);
+    public static <T> Result<T> fail(String message) {
+        return fail(CODE_FAIL, message);
     }
 
-    public static <T> Result<T> fail(int code, String msg) {
-        return new Result<>(code, msg, null);
+    public static <T> Result<T> fail(int code, String message) {
+        return new Result<>(code, message, null);
     }
 }
