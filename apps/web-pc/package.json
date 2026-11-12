@@ -2,7 +2,7 @@
   "name": "web-pc",
   "private": true,
   "version": "0.1.0",
-  "description": "CMCCPC PC 业务主站 - Vue3 + Vite + TypeScript + Element Plus（AI 业务面）",
+  "description": "组件练习后台骨架 - Vue3 + Vite + TypeScript + Element Plus（中间件练习导航）",
   "type": "module",
   "scripts": {
     "dev": "vite",

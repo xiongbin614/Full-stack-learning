@@ -1,174 +1,216 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { useUserStore } from '@/stores/user'
+import { getGroups, getModuleById } from '@/data'
+import OverviewDrawer from '@/components/OverviewDrawer.vue'
+import RequirementDrawer from '@/components/RequirementDrawer.vue'
 
 const route = useRoute()
 const router = useRouter()
-const userStore = useUserStore()
+const groups = getGroups()
 
-// 侧边栏菜单：从路由表生成（隐藏的 / 无标题的不展示）
-const menus = computed(() => {
-  return (router.options.routes || [])
-    .find((r) => r.path === '/')
-    ?.children?.filter((c) => !c.meta?.hidden && c.meta?.menuTitle)
-    .map((c) => ({ path: `/${c.path}`, title: c.meta!.menuTitle!, icon: c.meta!.icon }))
+const overviewOpen = ref(false)
+const requirementOpen = ref(false)
+const overviewKeyword = ref('')
+
+const activeMenu = computed(() => {
+  const id = route.params.id
+  return typeof id === 'string' ? `/modules/${id}` : route.path
 })
 
-const activeMenu = computed(() => route.path)
-const pageTitle = computed(() => route.meta.title || '')
+const currentModule = computed(() => {
+  const id = route.params.id
+  return typeof id === 'string' ? getModuleById(id) || null : null
+})
 
-async function handleLogout() {
-  try {
-    await ElMessageBox.confirm('确定退出登录吗？', '提示', {
-      confirmButtonText: '退出',
-      cancelButtonText: '取消',
-      type: 'warning',
-    })
-  } catch {
-    return
-  }
-  await userStore.logout()
-  ElMessage.success('已退出登录')
-  router.push('/login')
+function openOverview() {
+  overviewOpen.value = true
 }
 
-onMounted(() => {
-  // 刷新后若有 token 但缺用户信息，拉取一次（mock 阶段本地已有，此调用用于演示 401 链路）
-  if (userStore.isLoggedIn && !userStore.userInfo) {
-    userStore.fetchUserInfo()
+function openRequirements() {
+  if (!currentModule.value) {
+    overviewOpen.value = true
+    return
   }
-})
+  requirementOpen.value = true
+}
 </script>
 
 <template>
   <el-container class="layout">
-    <!-- 侧边栏 -->
-    <el-aside width="220px" class="layout-aside">
-      <div class="logo">
-        <el-icon :size="22" color="#fff"><Cpu /></el-icon>
-        <span class="logo-text">CMCCPC · AI 工作台</span>
+    <el-aside width="250px" class="layout-aside">
+      <div class="logo" @click="router.push('/modules/M00')">
+        <span class="logo-mark">练</span>
+        <div class="logo-text">
+          <b>组件练习后台</b>
+          <small>主区留给开发</small>
+        </div>
       </div>
-      <el-menu
-        :default-active="activeMenu"
-        router
-        background-color="#001529"
-        text-color="rgba(255,255,255,0.68)"
-        active-text-color="#fff"
-        class="layout-menu"
-      >
-        <el-menu-item v-for="m in menus" :key="m.path" :index="m.path">
-          <el-icon><component :is="m.icon" /></el-icon>
-          <span>{{ m.title }}</span>
-        </el-menu-item>
-      </el-menu>
+
+      <el-scrollbar class="aside-scroll">
+        <div v-for="g in groups" :key="g.name" class="nav-group">
+          <div class="grp">{{ g.name }}</div>
+          <el-menu :default-active="activeMenu" router class="layout-menu">
+            <el-menu-item
+              v-for="m in g.modules"
+              :key="m.id"
+              :index="`/modules/${m.id}`"
+            >
+              <span class="mid">{{ m.id }}</span>
+              <span class="nm">{{ m.name }}</span>
+              <el-tag
+                size="small"
+                effect="plain"
+                :type="m.priority === 'P0' ? 'danger' : m.priority === 'P1' ? 'warning' : 'info'"
+              >
+                {{ m.priority }}
+              </el-tag>
+            </el-menu-item>
+          </el-menu>
+        </div>
+      </el-scrollbar>
     </el-aside>
 
     <el-container>
-      <!-- 顶栏 -->
       <el-header class="layout-header" height="56px">
-        <div class="header-title">{{ pageTitle }}</div>
-        <el-dropdown trigger="click">
-          <div class="user-info">
-            <el-avatar :size="30" class="user-avatar">{{ userStore.nickname.slice(0, 1) }}</el-avatar>
-            <span class="user-name">{{ userStore.nickname }}</span>
-            <el-tag size="small" type="info" effect="plain" class="role-tag">{{ userStore.role }}</el-tag>
-            <el-icon><ArrowDown /></el-icon>
-          </div>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item disabled>账号：{{ userStore.userInfo?.username }}</el-dropdown-item>
-              <el-dropdown-item divided @click="handleLogout">
-                <el-icon><SwitchButton /></el-icon>退出登录
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
+        <div class="header-title">
+          <span>{{ route.meta.title || '组件练习' }}</span>
+          <el-tag size="small" type="info" effect="plain">开发区</el-tag>
+        </div>
+
+        <div class="header-actions">
+          <el-tooltip content="当前模块需求说明" placement="bottom">
+            <el-button circle @click="openRequirements">
+              <el-icon :size="18"><Document /></el-icon>
+            </el-button>
+          </el-tooltip>
+          <el-tooltip content="练习总览" placement="bottom">
+            <el-button circle type="primary" @click="openOverview">
+              <el-icon :size="18"><Grid /></el-icon>
+            </el-button>
+          </el-tooltip>
+        </div>
       </el-header>
 
-      <!-- 主内容 -->
       <el-main class="layout-main">
         <router-view />
       </el-main>
     </el-container>
+
+    <OverviewDrawer v-model="overviewOpen" v-model:keyword="overviewKeyword" />
+    <RequirementDrawer v-model="requirementOpen" :module="currentModule" />
   </el-container>
 </template>
 
 <style scoped>
 .layout {
-  height: 100vh;
+  height: 100%;
+  background: #eef1f6;
 }
-
 .layout-aside {
-  background-color: #001529;
+  background: #fff;
+  border-right: 1px solid #e3e8ef;
   display: flex;
   flex-direction: column;
 }
-
 .logo {
-  height: 56px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 14px 14px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #eef1f6;
+}
+.logo-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #2b6ef2, #4f9bff);
+  color: #fff;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 16px;
-  color: #fff;
-  font-weight: 600;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  flex-shrink: 0;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
 }
-
 .logo-text {
-  font-size: 14px;
-  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
 }
-
+.logo-text b {
+  font-size: 14px;
+}
+.logo-text small {
+  color: #93a0b4;
+  font-size: 11px;
+  margin-top: 2px;
+}
+.aside-scroll {
+  flex: 1;
+  padding-bottom: 24px;
+}
+.grp {
+  font-size: 11px;
+  color: #93a0b4;
+  letter-spacing: 0.5px;
+  padding: 14px 14px 6px;
+}
 .layout-menu {
   border-right: none;
-  flex: 1;
+  background: transparent;
 }
-
-.layout-menu :deep(.el-menu-item.is-active) {
-  background-color: #409eff;
-}
-
-.layout-header {
-  background: #fff;
-  border-bottom: 1px solid #e4e7ed;
+.layout-menu :deep(.el-menu-item) {
+  height: 40px;
+  line-height: 40px;
+  margin: 0 8px;
+  border-radius: 8px;
+  padding: 0 10px !important;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
+  gap: 8px;
 }
-
-.header-title {
-  font-size: 16px;
+.layout-menu :deep(.el-menu-item.is-active) {
+  background: #e8f0ff;
+  color: #1b4fd8;
   font-weight: 600;
 }
-
-.user-info {
+.mid {
+  width: 28px;
+  font-size: 11px;
+  color: #93a0b4;
+  flex-shrink: 0;
+}
+.nm {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+.layout-header {
+  background: #fff;
+  border-bottom: 1px solid #e3e8ef;
   display: flex;
   align-items: center;
+  gap: 16px;
+  padding: 0 20px;
+}
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.header-actions {
+  margin-left: auto;
+  display: flex;
   gap: 8px;
-  cursor: pointer;
-  outline: none;
 }
-
-.user-avatar {
-  background-color: #409eff;
-}
-
-.user-name {
-  font-size: 14px;
-}
-
-.role-tag {
-  text-transform: lowercase;
-}
-
 .layout-main {
-  background-color: #f5f7fa;
-  padding: 0;
-  overflow-y: auto;
+  padding: 16px 20px 24px;
+  height: calc(100% - 56px);
+  overflow: auto;
 }
 </style>

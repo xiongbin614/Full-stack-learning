@@ -1,0 +1,1479 @@
+{
+  "groups": [
+    {
+      "name": "基础底座",
+      "modules": [
+        {
+          "id": "M00",
+          "name": "MySQL 基础",
+          "priority": "P0"
+        }
+      ]
+    },
+    {
+      "name": "缓存与存储",
+      "modules": [
+        {
+          "id": "M01",
+          "name": "Redis",
+          "priority": "P0"
+        },
+        {
+          "id": "M08",
+          "name": "MinIO",
+          "priority": "P1"
+        }
+      ]
+    },
+    {
+      "name": "微服务治理",
+      "modules": [
+        {
+          "id": "M02",
+          "name": "Nacos",
+          "priority": "P0"
+        },
+        {
+          "id": "M03",
+          "name": "SpringCloud Gateway",
+          "priority": "P0"
+        },
+        {
+          "id": "M04",
+          "name": "Sentinel",
+          "priority": "P0"
+        }
+      ]
+    },
+    {
+      "name": "消息与异步",
+      "modules": [
+        {
+          "id": "M05",
+          "name": "Kafka",
+          "priority": "P0"
+        },
+        {
+          "id": "M06",
+          "name": "RocketMQ",
+          "priority": "P0"
+        }
+      ]
+    },
+    {
+      "name": "任务调度",
+      "modules": [
+        {
+          "id": "M07",
+          "name": "XXL-Job",
+          "priority": "P1"
+        },
+        {
+          "id": "M21",
+          "name": "DolphinScheduler",
+          "priority": "P2"
+        }
+      ]
+    },
+    {
+      "name": "检索与分析",
+      "modules": [
+        {
+          "id": "M09",
+          "name": "Elasticsearch",
+          "priority": "P0"
+        },
+        {
+          "id": "M13",
+          "name": "ClickHouse",
+          "priority": "P1"
+        },
+        {
+          "id": "M19",
+          "name": "Flink",
+          "priority": "P2"
+        },
+        {
+          "id": "M20",
+          "name": "Spark",
+          "priority": "P2"
+        }
+      ]
+    },
+    {
+      "name": "数据同步",
+      "modules": [
+        {
+          "id": "M10",
+          "name": "Canal",
+          "priority": "P1"
+        },
+        {
+          "id": "M11",
+          "name": "FlinkCDC",
+          "priority": "P2"
+        },
+        {
+          "id": "M12",
+          "name": "DataX",
+          "priority": "P2"
+        }
+      ]
+    },
+    {
+      "name": "可观测",
+      "modules": [
+        {
+          "id": "M14",
+          "name": "Prometheus + Grafana",
+          "priority": "P1"
+        },
+        {
+          "id": "M15",
+          "name": "SkyWalking",
+          "priority": "P1"
+        },
+        {
+          "id": "M22",
+          "name": "Filebeat",
+          "priority": "P1"
+        }
+      ]
+    },
+    {
+      "name": "数据一致性",
+      "modules": [
+        {
+          "id": "M16",
+          "name": "Seata",
+          "priority": "P1"
+        },
+        {
+          "id": "M17",
+          "name": "ShardingSphere-Proxy",
+          "priority": "P2"
+        }
+      ]
+    },
+    {
+      "name": "AI 能力",
+      "modules": [
+        {
+          "id": "M18",
+          "name": "Milvus",
+          "priority": "P2"
+        }
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "id": "M00",
+      "name": "MySQL 基础",
+      "priority": "P0",
+      "category": "基础底座",
+      "knowledge": "B+树索引、最左前缀、覆盖索引、ACID、MVCC、行锁/间隙锁、执行计划、慢查询、连接池",
+      "prereq": "无",
+      "reqCount": 4,
+      "hours": 14,
+      "requirements": [
+        {
+          "pageType": "列表页",
+          "id": "M00-01",
+          "title": "帖子表设计与分页查询",
+          "hours": "3h",
+          "desc": "设计 post / comment / user 三表，列表页支持分类筛选 + 热度/时间排序 + 游标分页，滚动到底可继续加载。",
+          "fields": "post_id, title, category, author, view_count, create_time；筛选、排序、下一页",
+          "api": "GET /api/post/page?cat=&sort=&cursor=",
+          "edge": "空结果返回空列表；翻页超界返回空页；同一时间戳数据不重复",
+          "acceptance": "10w 数据分页 RT&lt;100ms，翻 5 页无重复或漏数据",
+          "knowledge": "最左前缀、覆盖索引、回表"
+        },
+        {
+          "pageType": "详情页",
+          "id": "M00-02",
+          "title": "索引优化与执行计划",
+          "hours": "4h",
+          "desc": "详情页响应慢，用 EXPLAIN 定位，给高频查询建组合索引，并展示优化前后耗时对比。",
+          "fields": "EXPLAIN 输出、索引列表、优化前后耗时",
+          "api": "GET /api/post/{id}",
+          "edge": "函数索引、隐式类型转换导致索引失效要能看出来",
+          "acceptance": "慢查询从 300ms 降到 20ms，且 explain 显示命中索引",
+          "knowledge": "B+树、执行计划、索引失效场景"
+        },
+        {
+          "pageType": "表单页",
+          "id": "M00-03",
+          "title": "事务与并发扣减",
+          "hours": "4h",
+          "desc": "下单扣库存，验证事务与行锁；表单提交后可查看事务执行结果与库存余量。",
+          "fields": "stock, order_id, 数量输入、提交按钮",
+          "api": "POST /api/order",
+          "edge": "并发超卖、死锁、事务未回滚",
+          "acceptance": "200 并发不超卖，无死锁报错，失败订单自动回滚",
+          "knowledge": "ACID、隔离级别、行锁、间隙锁、MVCC"
+        },
+        {
+          "pageType": "监控页",
+          "id": "M00-04",
+          "title": "慢查询与连接池监控",
+          "hours": "3h",
+          "desc": "展示慢 SQL Top10（SQL、耗时、次数）与连接池活跃/等待数，支持一键看执行计划。",
+          "fields": "slow_sql, cost, count, pool_active, pool_wait",
+          "api": "GET /api/db/monitor",
+          "edge": "采集为空显示空态；连接池打满高亮",
+          "acceptance": "能列出 Top10 慢 SQL，连接池打满有预警",
+          "knowledge": "slow_query_log、连接池参数"
+        }
+      ]
+    },
+    {
+      "id": "M01",
+      "name": "Redis",
+      "priority": "P0",
+      "category": "缓存与存储",
+      "knowledge": "缓存旁路模式、键设计、序列化、TTL 随机打散、穿透/击穿/雪崩、分布式锁、Lua、INCR/ZSet、限流算法",
+      "prereq": "SpringBoot",
+      "reqCount": 5,
+      "hours": 17,
+      "requirements": [
+        {
+          "pageType": "详情页",
+          "id": "M01-01",
+          "title": "帖子详情缓存",
+          "hours": "3h",
+          "desc": "详情页走旁路缓存：先查 Redis，未命中回源 DB 并回填，TTL 加随机值防同时失效。",
+          "fields": "cache_key, ttl, 命中标记；页面上显示「命中/回源」标签",
+          "api": "GET /api/post/{id}",
+          "edge": "缓存空值、序列化失败、回源并发打爆 DB",
+          "acceptance": "命中率&gt;80%，二次请求明显变快，页面能看到命中标记",
+          "knowledge": "旁路缓存、键设计、序列化、随机 TTL"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M01-02",
+          "title": "缓存三大问题演示台",
+          "hours": "4h",
+          "desc": "三个开关分别制造穿透/击穿/雪崩，每个问题旁挂对应解法按钮（空值缓存、互斥锁、随机 TTL+降级），修复后指标回落。",
+          "fields": "开关：穿透/击穿/雪崩；指标：QPS、DB 命中数、RT",
+          "api": "POST /api/cache/switch",
+          "edge": "开关组合冲突、压测工具不可用",
+          "acceptance": "三种问题都能复现，点解法后指标明显回落",
+          "knowledge": "布隆过滤器、互斥锁、逻辑过期、多级缓存"
+        },
+        {
+          "pageType": "表单页",
+          "id": "M01-03",
+          "title": "分布式锁扣库存",
+          "hours": "4h",
+          "desc": "抢购页用 SETNX+Lua 释放锁，Redisson 看门狗续期；并发提交后展示成功/失败明细。",
+          "fields": "lock_key, stock, 并发数输入",
+          "api": "POST /api/stock/deduct",
+          "edge": "锁超时、误删他人锁、重入",
+          "acceptance": "100 并发不超卖，锁释放不误删，页面有成功失败明细",
+          "knowledge": "SETNX、Lua 原子性、看门狗、红锁"
+        },
+        {
+          "pageType": "看板",
+          "id": "M01-04",
+          "title": "浏览量计数与小时榜",
+          "hours": "3h",
+          "desc": "浏览页 INCR 计数，ZSet 做小时榜，看板展示 Top10 与实时计数。",
+          "fields": "zset_key, score, rank",
+          "api": "GET /api/rank/hourly",
+          "edge": "计数为负、榜单为空",
+          "acceptance": "榜单一秒内出结果，计数与实际访问一致",
+          "knowledge": "INCR、ZSet、pipeline"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M01-05",
+          "title": "接口限流器",
+          "hours": "3h",
+          "desc": "按 IP/用户双维度限流，滑动窗口 + Lua 令牌桶，超阈值返回 429 与重试时间。",
+          "fields": "limit_key, threshold, window",
+          "api": "GET /api/limit/status",
+          "edge": "超阈值、时钟漂移、白名单",
+          "acceptance": "压测超阈值被拦，正常流量不误杀，429 带 Retry-After",
+          "knowledge": "滑动窗口、令牌桶、Lua 原子性"
+        }
+      ]
+    },
+    {
+      "id": "M08",
+      "name": "MinIO",
+      "priority": "P1",
+      "category": "缓存与存储",
+      "knowledge": "桶与对象、访问策略与预签名、分片上传与合并、断点续传、哈希秒传、生命周期",
+      "prereq": "Docker",
+      "reqCount": 4,
+      "hours": 12,
+      "requirements": [
+        {
+          "pageType": "表单页",
+          "id": "M08-01",
+          "title": "图片上传与私有桶",
+          "hours": "3h",
+          "desc": "上传图片到私有桶，返回对象名；预览用预签名 URL，过期自动失效。",
+          "fields": "bucket, object, 预签名 URL",
+          "api": "POST /api/file/upload",
+          "edge": "超大文件、类型不在白名单",
+          "acceptance": "私有 URL 过期后打不开，白名单生效",
+          "knowledge": "桶、对象、策略"
+        },
+        {
+          "pageType": "表单页",
+          "id": "M08-02",
+          "title": "分片上传与断点续传",
+          "hours": "4h",
+          "desc": "大文件切片上传、合并、失败可续传；页面展示分片进度条。",
+          "fields": "upload_id, part_no, etag, 进度",
+          "api": "POST /api/file/multipart",
+          "edge": "分片丢失、合并失败",
+          "acceptance": "100MB 文件可断点续传并成功合并",
+          "knowledge": "分片、merge、etag"
+        },
+        {
+          "pageType": "详情页",
+          "id": "M08-03",
+          "title": "秒传（哈希去重）",
+          "hours": "3h",
+          "desc": "上传前算文件哈希查重，已存在直接秒传，页面显示「已秒传」。",
+          "fields": "hash, etag, 秒传标记",
+          "api": "POST /api/file/check",
+          "edge": "哈希冲突、同哈希不同内容",
+          "acceptance": "重复文件 100ms 内返回已存在",
+          "knowledge": "秒传、指纹"
+        },
+        {
+          "pageType": "列表页",
+          "id": "M08-04",
+          "title": "文件管理列表",
+          "hours": "2h",
+          "desc": "按桶/前缀列出对象、大小、修改时间，支持预览与下载。",
+          "fields": "key, size, last_modified",
+          "api": "GET /api/file/list",
+          "edge": "空桶、权限不足",
+          "acceptance": "列表分页正常，下载可用",
+          "knowledge": "对象列举、生命周期"
+        }
+      ]
+    },
+    {
+      "id": "M02",
+      "name": "Nacos",
+      "priority": "P0",
+      "category": "微服务治理",
+      "knowledge": "注册中心、临时实例与心跳、配置中心、命名空间/分组、灰度发布、配置回滚",
+      "prereq": "SpringBoot",
+      "reqCount": 4,
+      "hours": 10,
+      "requirements": [
+        {
+          "pageType": "列表页",
+          "id": "M02-01",
+          "title": "服务注册与实例列表",
+          "hours": "3h",
+          "desc": "展示服务名、实例 IP、端口、健康状态、注册时间，支持下线实例与查看元数据。",
+          "fields": "service, ip, port, healthy, register_time",
+          "api": "GET /api/nacos/services",
+          "edge": "实例下线延迟、健康检查误判",
+          "acceptance": "注册后可见，下线 5s 内从列表消失",
+          "knowledge": "注册中心、心跳、临时实例"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M02-02",
+          "title": "配置热更新",
+          "hours": "3h",
+          "desc": "限流阈值、功能开关在页面修改后发布，服务不重启即生效，并可回滚上一版。",
+          "fields": "data_id, group, content, 开关与输入框",
+          "api": "POST /api/config/publish",
+          "edge": "格式错误发布失败、推送丢失",
+          "acceptance": "10s 内生效，回滚可用，页面显示当前生效值",
+          "knowledge": "配置中心、监听刷新、灰度"
+        },
+        {
+          "pageType": "列表页",
+          "id": "M02-03",
+          "title": "命名空间与多环境隔离",
+          "hours": "2h",
+          "desc": "dev/test/prod 三套配置隔离，同一 key 在不同命名空间互不影响，可切换查看。",
+          "fields": "namespace, group, 环境切换 tab",
+          "api": "GET /api/config/list",
+          "edge": "跨命名空间误读、配置串环境",
+          "acceptance": "三套互不影响，切换 tab 正确显示各自配置",
+          "knowledge": "namespace、group、隔离"
+        },
+        {
+          "pageType": "详情页",
+          "id": "M02-04",
+          "title": "配置变更审计",
+          "hours": "2h",
+          "desc": "记录谁改了哪个 key、旧值/新值、发布时间与生效结果，支持按人/时间筛选。",
+          "fields": "operator, key, old_value, new_value, publish_time",
+          "api": "GET /api/config/history",
+          "edge": "无变更显示空表、审计缺失",
+          "acceptance": "每次发布都有可追溯记录，可按时间筛选",
+          "knowledge": "灰度发布、回滚、审计"
+        }
+      ]
+    },
+    {
+      "id": "M03",
+      "name": "SpringCloud Gateway",
+      "priority": "P0",
+      "category": "微服务治理",
+      "knowledge": "路由断言、过滤器链、JWT 鉴权、灰度权重路由、CORS、网关限流、全局日志埋点",
+      "prereq": "Nacos",
+      "reqCount": 5,
+      "hours": 14,
+      "requirements": [
+        {
+          "pageType": "配置页",
+          "id": "M03-01",
+          "title": "路由与统一响应",
+          "hours": "3h",
+          "desc": "按 path 前缀路由到后端服务，统一错误响应体（code/msg/traceId），路由可增删改。",
+          "fields": "route_id, path, service, 新增/编辑表单",
+          "api": "GET /api/gw/routes",
+          "edge": "无匹配路由、后端不可达",
+          "acceptance": "路由命中正确，404/502 都返回统一结构",
+          "knowledge": "Predicate、过滤器链"
+        },
+        {
+          "pageType": "表单页",
+          "id": "M03-02",
+          "title": "JWT 鉴权过滤器",
+          "hours": "3h",
+          "desc": "登录发 token，网关校验签名与过期时间，解析 userId 写入下游 header。",
+          "fields": "token, user_id, 过期时间",
+          "api": "POST /api/auth/login",
+          "edge": "token 篡改、过期、缺失",
+          "acceptance": "未带 token 被拦截，篡改返回 403，过期返回 401",
+          "knowledge": "GatewayFilter、GlobalFilter、JWT"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M03-03",
+          "title": "灰度发布按比例分流",
+          "hours": "3h",
+          "desc": "按用户白名单或百分比把流量分到新版本，页面显示当前灰度比例与回滚按钮。",
+          "fields": "percent, version, 白名单",
+          "api": "POST /api/gw/gray",
+          "edge": "比例和不为 100、回滚未生效",
+          "acceptance": "10% 灰度可验证，一键回滚后全部走旧版",
+          "knowledge": "灰度、权重路由"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M03-04",
+          "title": "网关层限流与跨域",
+          "hours": "3h",
+          "desc": "Redis 令牌桶在网关层限流，配置允许域名、方法与 header。",
+          "fields": "cors 配置、limit 配置",
+          "api": "OPTIONS /api/*",
+          "edge": "预检失败、限流误杀",
+          "acceptance": "跨域预检通过，限流超阈值返回 429",
+          "knowledge": "CORS、限流"
+        },
+        {
+          "pageType": "监控页",
+          "id": "M03-05",
+          "title": "请求日志与耗时统计",
+          "hours": "2h",
+          "desc": "记录 path、状态码、耗时、traceId，按耗时倒序列出慢请求，可跳转链路。",
+          "fields": "trace_id, path, status, cost",
+          "api": "GET /api/gw/logs",
+          "edge": "日志量大分页、traceId 缺失",
+          "acceptance": "慢请求可按耗时排序，点 traceId 能跳到追踪页",
+          "knowledge": "全局过滤器、埋点"
+        }
+      ]
+    },
+    {
+      "id": "M04",
+      "name": "Sentinel",
+      "priority": "P0",
+      "category": "微服务治理",
+      "knowledge": "流控模式（直接/关联/链路）、流控效果（快速失败/Warm Up/排队）、熔断器与半开、热点参数、规则持久化",
+      "prereq": "Nacos / Gateway",
+      "reqCount": 4,
+      "hours": 11,
+      "requirements": [
+        {
+          "pageType": "配置页",
+          "id": "M04-01",
+          "title": "接口 QPS 限流",
+          "hours": "3h",
+          "desc": "按资源名配置 QPS 阈值与流控效果，保存后 Dashboard 可见，页面展示实时 QPS 与拦截数。",
+          "fields": "resource, qps, effect, 实时 QPS",
+          "api": "POST /api/sentinel/rule",
+          "edge": "规则冲突、阈值过低误杀",
+          "acceptance": "Dashboard 能看到流控生效，超阈值返回兜底响应",
+          "knowledge": "流控模式、流控效果"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M04-02",
+          "title": "慢调用熔断降级",
+          "hours": "3h",
+          "desc": "RT 超阈值按比例熔断，熔断期间返回兜底文案，半开自动试探恢复。",
+          "fields": "rt 阈值、比例、时间窗口、熔断状态",
+          "api": "GET /api/slow",
+          "edge": "熔断中请求仍打到下游、半开不恢复",
+          "acceptance": "熔断后返回兜底，服务恢复后自动放量",
+          "knowledge": "熔断器、半开状态"
+        },
+        {
+          "pageType": "表单页",
+          "id": "M04-03",
+          "title": "热点参数限流",
+          "hours": "3h",
+          "desc": "按商品 ID 维度限流，单个热点被限不影响其他商品，页面可选参数值测试。",
+          "fields": "param 值、阈值",
+          "api": "GET /api/hot/{id}",
+          "edge": "参数缺失不参与限流、热点判定错误",
+          "acceptance": "单热点被限流，其他商品不受影响",
+          "knowledge": "热点参数规则"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M04-04",
+          "title": "规则持久化到 Nacos",
+          "hours": "2h",
+          "desc": "规则改 Nacos 后重启不丢，页面展示规则来源与最后同步时间。",
+          "fields": "data_id, rule, 同步时间",
+          "api": "POST /api/sentinel/persist",
+          "edge": "拉取失败、规则覆盖",
+          "acceptance": "重启后规则仍在，同步失败有告警",
+          "knowledge": "动态规则、数据源"
+        }
+      ]
+    },
+    {
+      "id": "M05",
+      "name": "Kafka",
+      "priority": "P0",
+      "category": "消息与异步",
+      "knowledge": "topic/分区/副本、生产者 acks、消费组与手动提交、key 分区顺序、lag 与 rebalance、批量与压缩",
+      "prereq": "Docker",
+      "reqCount": 4,
+      "hours": 13,
+      "requirements": [
+        {
+          "pageType": "列表页",
+          "id": "M05-01",
+          "title": "发帖异步通知",
+          "hours": "4h",
+          "desc": "发帖成功后投递消息，通知服务消费后发站内信；页面可看消息状态（投递/消费/重试）。",
+          "fields": "topic, msg_key, offset, 状态",
+          "api": "POST /api/post + 消费 /notify",
+          "edge": "消费失败重试、重复消费",
+          "acceptance": "发帖 1s 内收到通知，重复消息不重复发",
+          "knowledge": "topic、分区、消费组、手动提交"
+        },
+        {
+          "pageType": "详情页",
+          "id": "M05-02",
+          "title": "分区与顺序消费",
+          "hours": "3h",
+          "desc": "同一 userId 的事件落同一分区保证顺序，页面展示分区分布与各分区消息量。",
+          "fields": "partition, key, 分布",
+          "api": "GET /api/kafka/partitions",
+          "edge": "分区倾斜、顺序被破坏",
+          "acceptance": "同一用户事件顺序一致，倾斜有提示",
+          "knowledge": "key 分区、顺序性"
+        },
+        {
+          "pageType": "监控页",
+          "id": "M05-03",
+          "title": "消费积压与重平衡",
+          "hours": "3h",
+          "desc": "展示各消费组 lag、消费速率、rebalance 次数，积压高亮并给出扩容建议。",
+          "fields": "lag, rate, rebalance",
+          "api": "GET /api/kafka/lag",
+          "edge": "无积压显示 0、组无消费者",
+          "acceptance": "能一眼看出积压组并定位慢消费",
+          "knowledge": "lag、rebalance、批量消费"
+        },
+        {
+          "pageType": "看板",
+          "id": "M05-04",
+          "title": "埋点上报（高吞吐）",
+          "hours": "3h",
+          "desc": "浏览/点击埋点批量上报，异步落库；看板展示上报量、丢失率、端到端延迟。",
+          "fields": "event, ts, uid, 批量大小",
+          "api": "POST /api/track/batch",
+          "edge": "大批量丢弃、字段缺失",
+          "acceptance": "1w QPS 埋点关键字段不丢，丢失率可观测",
+          "knowledge": "批量、压缩、acks"
+        }
+      ]
+    },
+    {
+      "id": "M06",
+      "name": "RocketMQ",
+      "priority": "P0",
+      "category": "消息与异步",
+      "knowledge": "事务消息与回查、延迟等级、消费重试、死信队列、消息轨迹、幂等消费",
+      "prereq": "Docker",
+      "reqCount": 4,
+      "hours": 14,
+      "requirements": [
+        {
+          "pageType": "表单页",
+          "id": "M06-01",
+          "title": "点赞积分（事务消息）",
+          "hours": "4h",
+          "desc": "点赞后本地事务落库与消息发送保持一致，异常时回查兜底；页面展示事务状态。",
+          "fields": "tx_id, 事务状态",
+          "api": "POST /api/like",
+          "edge": "本地事务失败、回查失败",
+          "acceptance": "积分与点赞一致，异常时不半成功",
+          "knowledge": "事务消息、回查"
+        },
+        {
+          "pageType": "任务页",
+          "id": "M06-02",
+          "title": "延迟消息取消订单",
+          "hours": "4h",
+          "desc": "30 分钟未支付自动取消并回滚库存；页面可选测试延迟（如 30s）观察取消结果。",
+          "fields": "order_id, delay_level, 状态",
+          "api": "POST /api/order + 消费 cancel",
+          "edge": "重复取消、回滚失败",
+          "acceptance": "到点准时取消，重复消费不重复回滚",
+          "knowledge": "延迟等级、定时消息"
+        },
+        {
+          "pageType": "监控页",
+          "id": "M06-03",
+          "title": "消费重试与死信队列",
+          "hours": "3h",
+          "desc": "展示重试次数、死信列表、可手动重投；重投后状态更新。",
+          "fields": "retry, dlq, msg_id",
+          "api": "GET /api/mq/dlq",
+          "edge": "死信积压、重投失败",
+          "acceptance": "失败进 DLQ 可手动重投，积压有告警",
+          "knowledge": "重试、死信、幂等"
+        },
+        {
+          "pageType": "详情页",
+          "id": "M06-04",
+          "title": "消息轨迹查询",
+          "hours": "3h",
+          "desc": "按 msgId 查投递/存储/消费三段轨迹与各段耗时。",
+          "fields": "msg_id, trace 三段",
+          "api": "GET /api/mq/trace",
+          "edge": "未查到、轨迹缺失",
+          "acceptance": "能定位消息卡在哪一段",
+          "knowledge": "轨迹、消息查询"
+        }
+      ]
+    },
+    {
+      "id": "M07",
+      "name": "XXL-Job",
+      "priority": "P1",
+      "category": "任务调度",
+      "knowledge": "调度中心与执行器、cron、分片广播、失败重试、阻塞策略、任务依赖、执行日志",
+      "prereq": "SpringBoot + Nacos",
+      "reqCount": 4,
+      "hours": 10,
+      "requirements": [
+        {
+          "pageType": "任务页",
+          "id": "M07-01",
+          "title": "定时热度榜任务",
+          "hours": "3h",
+          "desc": "每小时刷 Redis 浏览量回写 DB 并重算 Top10；页面可手动触发、暂停、看执行日志。",
+          "fields": "job_id, cron, 执行日志",
+          "api": "POST /api/job/trigger",
+          "edge": "执行失败、执行器离线",
+          "acceptance": "整点自动执行，日志可查，手动触发生效",
+          "knowledge": "调度中心、执行器、cron"
+        },
+        {
+          "pageType": "任务页",
+          "id": "M07-02",
+          "title": "分片广播并行处理",
+          "hours": "3h",
+          "desc": "按分片参数并行处理 100w 数据，页面展示各分片进度与总耗时。",
+          "fields": "shard_index, shard_total, 进度",
+          "api": "GET /api/job/shard",
+          "edge": "分片不均、部分失败",
+          "acceptance": "两执行器各跑一半，耗时约减半",
+          "knowledge": "分片广播、并行"
+        },
+        {
+          "pageType": "监控页",
+          "id": "M07-03",
+          "title": "任务失败告警与重试",
+          "hours": "2h",
+          "desc": "失败次数&gt;3 告警到飞书，页面可看失败原因并手动重跑。",
+          "fields": "fail_count, alert, 重跑按钮",
+          "api": "GET /api/job/status",
+          "edge": "告警通道失败、重跑重复",
+          "acceptance": "连续失败触发告警，重跑可恢复",
+          "knowledge": "失败重试、告警"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M07-04",
+          "title": "任务依赖与阻塞策略",
+          "hours": "2h",
+          "desc": "A 完成后再跑 B，可选串行/丢弃/覆盖三种阻塞策略。",
+          "fields": "依赖关系、阻塞策略",
+          "api": "POST /api/job/dep",
+          "edge": "依赖成环、重复触发",
+          "acceptance": "依赖顺序正确，重复触发按策略处理",
+          "knowledge": "阻塞策略、依赖"
+        }
+      ]
+    },
+    {
+      "id": "M21",
+      "name": "DolphinScheduler",
+      "priority": "P2",
+      "category": "任务调度",
+      "knowledge": "DAG 与依赖、定时周期、补数、告警与日志",
+      "prereq": "Spark / Flink 基础",
+      "reqCount": 3,
+      "hours": 7,
+      "requirements": [
+        {
+          "pageType": "任务页",
+          "id": "M21-01",
+          "title": "DAG 编排",
+          "hours": "3h",
+          "desc": "3 节点 DAG（同步→清洗→汇总）配置依赖，页面可视化节点状态。",
+          "fields": "dag_id, node, dep",
+          "api": "POST /api/ds/dag",
+          "edge": "成环、依赖缺失",
+          "acceptance": "DAG 跑通且依赖顺序正确",
+          "knowledge": "DAG、依赖"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M21-02",
+          "title": "定时与补数",
+          "hours": "2h",
+          "desc": "按日调度并支持指定日期补数，页面展示执行日历。",
+          "fields": "cron, backfill_date",
+          "api": "POST /api/ds/backfill",
+          "edge": "补数区间冲突",
+          "acceptance": "补数可跑且结果正确",
+          "knowledge": "调度周期、补数"
+        },
+        {
+          "pageType": "监控页",
+          "id": "M21-03",
+          "title": "告警与日志",
+          "hours": "2h",
+          "desc": "实例状态、失败告警、日志下载与重跑。",
+          "fields": "instance, status, log",
+          "api": "GET /api/ds/logs",
+          "edge": "日志缺失",
+          "acceptance": "失败可在页面看到原因",
+          "knowledge": "告警、日志"
+        }
+      ]
+    },
+    {
+      "id": "M09",
+      "name": "Elasticsearch",
+      "priority": "P0",
+      "category": "检索与分析",
+      "knowledge": "倒排索引、mapping 与分词器、多字段检索、高亮、聚合、completion suggester、段合并与索引健康",
+      "prereq": "Canal / FlinkCDC（可选）",
+      "reqCount": 5,
+      "hours": 15,
+      "requirements": [
+        {
+          "pageType": "列表页",
+          "id": "M09-01",
+          "title": "帖子全文搜索",
+          "hours": "4h",
+          "desc": "搜索页支持多字段检索、中文分词、关键词高亮、分页与排序，无结果给建议词。",
+          "fields": "keyword, 高亮片段, 分页, 排序",
+          "api": "GET /api/search",
+          "edge": "无结果、分词不合理、深分页",
+          "acceptance": "10w 数据 &lt;200ms，高亮正确，分页不丢不重",
+          "knowledge": "倒排索引、分词、mapping"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M09-02",
+          "title": "索引设计与 mapping",
+          "hours": "3h",
+          "desc": "定义字段类型、分词器、分片副本，页面展示当前 mapping 并可重建索引。",
+          "fields": "mapping, analyzer, shards, replicas",
+          "api": "PUT /api/es/index",
+          "edge": "mapping 冲突、分词器缺失",
+          "acceptance": "中文分词生效，字段类型正确",
+          "knowledge": "mapping、analyzer、分片"
+        },
+        {
+          "pageType": "看板",
+          "id": "M09-03",
+          "title": "聚合统计（分类/作者榜）",
+          "hours": "3h",
+          "desc": "terms 聚合出分类分布与作者 Top10，配柱状图与占比。",
+          "fields": "agg 字段, size, 图表",
+          "api": "GET /api/es/agg",
+          "edge": "字段未开 doc_values、聚合超时",
+          "acceptance": "聚合结果与 SQL 一致，图表可切换维度",
+          "knowledge": "terms 聚合、doc_values"
+        },
+        {
+          "pageType": "表单页",
+          "id": "M09-04",
+          "title": "搜索建议与纠错",
+          "hours": "3h",
+          "desc": "输入前缀给补全建议，错字给「你是不是想搜」纠正。",
+          "fields": "prefix, did_you_mean",
+          "api": "GET /api/search/suggest",
+          "edge": "无建议、建议质量差",
+          "acceptance": "输入前缀出建议，错字给纠正",
+          "knowledge": "completion、term suggester"
+        },
+        {
+          "pageType": "监控页",
+          "id": "M09-05",
+          "title": "索引健康与慢查询",
+          "hours": "2h",
+          "desc": "展示索引大小、段数、慢查询 Top，段过多提示 force_merge。",
+          "fields": "index_size, segments, slow",
+          "api": "GET /api/es/health",
+          "edge": "无数据空态",
+          "acceptance": "能看出索引膨胀与慢查询",
+          "knowledge": "段合并、_cat API"
+        }
+      ]
+    },
+    {
+      "id": "M13",
+      "name": "ClickHouse",
+      "priority": "P1",
+      "category": "检索与分析",
+      "knowledge": "MergeTree 引擎、分区与排序键、列存与向量化、物化视图、稀疏索引",
+      "prereq": "Canal / DataX",
+      "reqCount": 4,
+      "hours": 12,
+      "requirements": [
+        {
+          "pageType": "看板",
+          "id": "M13-01",
+          "title": "内容数据看板",
+          "hours": "4h",
+          "desc": "PV/UV/互动率按日/分类/作者多维聚合，页面支持切维度与时间范围。",
+          "fields": "dt, cat, author, pv, uv",
+          "api": "GET /api/stat/overview",
+          "edge": "无数据空态",
+          "acceptance": "千万级聚合秒级返回",
+          "knowledge": "列存、向量化、物化视图"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M13-02",
+          "title": "表引擎与分区设计",
+          "hours": "3h",
+          "desc": "设计 MergeTree 分区、排序键，页面展示建表语句与分区列表。",
+          "fields": "engine, partition, order_by",
+          "api": "POST /api/ch/table",
+          "edge": "分区过细、排序键不合理",
+          "acceptance": "查询命中分区裁剪，分区数量可控",
+          "knowledge": "MergeTree、分区、主键"
+        },
+        {
+          "pageType": "列表页",
+          "id": "M13-03",
+          "title": "明细查询与导出",
+          "hours": "3h",
+          "desc": "明细检索 + 条件筛选 + 分页 + 导出 CSV，展示扫描行数。",
+          "fields": "filter, export, 扫描行数",
+          "api": "GET /api/ch/detail",
+          "edge": "大结果超时",
+          "acceptance": "千万级筛选可用，导出成功",
+          "knowledge": "稀疏索引、limit"
+        },
+        {
+          "pageType": "详情页",
+          "id": "M13-04",
+          "title": "与 ES 查询对比",
+          "hours": "2h",
+          "desc": "同条件查询在 ES 与 CH 的耗时并排展示，给出选型结论。",
+          "fields": "cost_es, cost_ch, 结论",
+          "api": "GET /api/compare",
+          "edge": "任一侧失败标注",
+          "acceptance": "展示两侧耗时与结论",
+          "knowledge": "场景差异"
+        }
+      ]
+    },
+    {
+      "id": "M19",
+      "name": "Flink",
+      "priority": "P2",
+      "category": "检索与分析",
+      "knowledge": "窗口与水位线、状态与状态后端、checkpoint、迟到数据与侧输出流",
+      "prereq": "Kafka",
+      "reqCount": 3,
+      "hours": 9,
+      "requirements": [
+        {
+          "pageType": "看板",
+          "id": "M19-01",
+          "title": "实时大屏（窗口统计）",
+          "hours": "4h",
+          "desc": "滑动窗口统计每分钟发帖量与热门话题 TopN，大屏秒级刷新。",
+          "fields": "window, topic, count",
+          "api": "GET /api/flink/screen",
+          "edge": "无数据空态",
+          "acceptance": "窗口结果与手工核对一致",
+          "knowledge": "窗口、水位线"
+        },
+        {
+          "pageType": "监控页",
+          "id": "M19-02",
+          "title": "状态与 checkpoint",
+          "hours": "3h",
+          "desc": "展示状态大小、最近 checkpoint、恢复次数。",
+          "fields": "state_size, cp, restore",
+          "api": "GET /api/flink/state",
+          "edge": "无 cp 可用",
+          "acceptance": "作业重启后状态可恢复",
+          "knowledge": "状态后端、checkpoint"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M19-03",
+          "title": "迟到数据处理",
+          "hours": "2h",
+          "desc": "配置允许迟到时间与侧输出流，展示被侧输出的数据。",
+          "fields": "allowed_lateness, side_output",
+          "api": "GET /api/flink/late",
+          "edge": "超时数据丢失",
+          "acceptance": "迟到数据按规则进入侧流",
+          "knowledge": "水位线、侧输出"
+        }
+      ]
+    },
+    {
+      "id": "M20",
+      "name": "Spark",
+      "priority": "P2",
+      "category": "检索与分析",
+      "knowledge": "分层数仓 ODS/DWD/ADS、宽表、shuffle 与分区、数据倾斜、广播变量",
+      "prereq": "本地 / 伪分布式环境",
+      "reqCount": 3,
+      "hours": 10,
+      "requirements": [
+        {
+          "pageType": "看板",
+          "id": "M20-01",
+          "title": "T+1 用户行为报表",
+          "hours": "4h",
+          "desc": "ODS→DWD→ADS 三层跑通，产出活跃、留存、人均时长指标。",
+          "fields": "dt, dau, retention",
+          "api": "GET /api/spark/report",
+          "edge": "分区缺失",
+          "acceptance": "结果与直接写 SQL 的口径一致",
+          "knowledge": "分层、宽表"
+        },
+        {
+          "pageType": "任务页",
+          "id": "M20-02",
+          "title": "离线 ETL 任务编排",
+          "hours": "3h",
+          "desc": "任务链按依赖串跑，失败重试；页面展示各阶段状态与耗时。",
+          "fields": "stage, dep, 状态",
+          "api": "POST /api/spark/run",
+          "edge": "上游失败、重复跑",
+          "acceptance": "任务链按序跑通，失败可从阶段重试",
+          "knowledge": "DAG、依赖"
+        },
+        {
+          "pageType": "监控页",
+          "id": "M20-03",
+          "title": "资源与 Shuffle 调优",
+          "hours": "3h",
+          "desc": "展示 shuffle 读写量、倾斜分区、executor 资源。",
+          "fields": "shuffle_read, skew, 资源",
+          "api": "GET /api/spark/metrics",
+          "edge": "无指标",
+          "acceptance": "能看出倾斜并说明调参方向",
+          "knowledge": "shuffle、分区、广播"
+        }
+      ]
+    },
+    {
+      "id": "M10",
+      "name": "Canal",
+      "priority": "P1",
+      "category": "数据同步",
+      "knowledge": "binlog 监听、RowData 解析、位点持久化、HA、过滤与字段映射",
+      "prereq": "MySQL binlog",
+      "reqCount": 3,
+      "hours": 8,
+      "requirements": [
+        {
+          "pageType": "监控页",
+          "id": "M10-01",
+          "title": "binlog 实时同步到 ES",
+          "hours": "3h",
+          "desc": "监听 post 表变更写入 ES，页面展示位点、延迟与同步条数。",
+          "fields": "binlog_pos, delay, 条数",
+          "api": "GET /api/canal/status",
+          "edge": "位点丢失、延迟飙升",
+          "acceptance": "改一条数据 3s 内 ES 可见",
+          "knowledge": "binlog、位点、RowData"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M10-02",
+          "title": "位点续传与故障恢复",
+          "hours": "3h",
+          "desc": "停服后重启从上次位点续传，页面可查看/重置位点。",
+          "fields": "position, restart",
+          "api": "POST /api/canal/restart",
+          "edge": "位点不存在需重全量",
+          "acceptance": "重启不丢不重",
+          "knowledge": "位点持久化、HA"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M10-03",
+          "title": "数据过滤与字段映射",
+          "hours": "2h",
+          "desc": "只同步指定表/字段，配置字段改名映射，保存后即时生效。",
+          "fields": "filter 规则, mapping",
+          "api": "POST /api/canal/filter",
+          "edge": "规则错误导致启动失败",
+          "acceptance": "只同步配置的表与字段",
+          "knowledge": "过滤、映射"
+        }
+      ]
+    },
+    {
+      "id": "M11",
+      "name": "FlinkCDC",
+      "priority": "P2",
+      "category": "数据同步",
+      "knowledge": "全量快照 + 增量 binlog、流式 ETL 清洗、状态去重、维表 join、checkpoint 恢复",
+      "prereq": "Flink 集群",
+      "reqCount": 3,
+      "hours": 10,
+      "requirements": [
+        {
+          "pageType": "任务页",
+          "id": "M11-01",
+          "title": "全量+增量同步",
+          "hours": "4h",
+          "desc": "order 表全量快照后自动转增量，永不断流；页面展示阶段、进度、速率。",
+          "fields": "job_id, checkpoint, 阶段",
+          "api": "POST /api/cdc/start",
+          "edge": "快照失败、增量断流",
+          "acceptance": "全量转增量不丢数据",
+          "knowledge": "快照、增量、binlog"
+        },
+        {
+          "pageType": "任务页",
+          "id": "M11-02",
+          "title": "清洗与去重",
+          "hours": "3h",
+          "desc": "流内清洗空值、按主键去重、关联维表补字段，脏数据进旁路表。",
+          "fields": "clean 规则, dedup, 旁路表",
+          "api": "GET /api/cdc/rules",
+          "edge": "脏数据混入主表",
+          "acceptance": "脏数据进旁路表且可查",
+          "knowledge": "流式 ETL、状态去重"
+        },
+        {
+          "pageType": "监控页",
+          "id": "M11-03",
+          "title": "checkpoint 恢复",
+          "hours": "3h",
+          "desc": "展示 checkpoint 间隔、最近 cp、恢复次数，展示从 cp 续跑记录。",
+          "fields": "cp_id, restore_count",
+          "api": "GET /api/cdc/cp",
+          "edge": "无 cp 可用",
+          "acceptance": "重启后从 cp 续跑不重复",
+          "knowledge": "checkpoint、savepoint"
+        }
+      ]
+    },
+    {
+      "id": "M12",
+      "name": "DataX",
+      "priority": "P2",
+      "category": "数据同步",
+      "knowledge": "reader/writer 插件、并发与限流、脏数据记录、失败重跑、调度集成",
+      "prereq": "可与 XXL-Job 配合",
+      "reqCount": 3,
+      "hours": 7,
+      "requirements": [
+        {
+          "pageType": "任务页",
+          "id": "M12-01",
+          "title": "全量同步任务",
+          "hours": "3h",
+          "desc": "MySQL→ClickHouse 全量同步，页面展示速度、行数、脏数据条数。",
+          "fields": "job_id, speed, dirty",
+          "api": "POST /api/datax/run",
+          "edge": "连接失败、超时",
+          "acceptance": "任务成功且脏数据条数可见",
+          "knowledge": "reader/writer、并发"
+        },
+        {
+          "pageType": "监控页",
+          "id": "M12-02",
+          "title": "脏数据与失败重跑",
+          "hours": "2h",
+          "desc": "展示错误记录（行号、字段、原因），支持按 job 重跑。",
+          "fields": "error_record, rerun",
+          "api": "GET /api/datax/errors",
+          "edge": "错误超阈值中止",
+          "acceptance": "可定位错误行并重跑成功",
+          "knowledge": "错误限制、限流"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M12-03",
+          "title": "与调度打通",
+          "hours": "2h",
+          "desc": "被 XXL-Job 每日调度，页面展示 cron、上次执行与下次时间。",
+          "fields": "cron, last_run, next_run",
+          "api": "GET /api/datax/schedule",
+          "edge": "未调度、调度失败",
+          "acceptance": "每日自动执行且有记录",
+          "knowledge": "调度集成"
+        }
+      ]
+    },
+    {
+      "id": "M14",
+      "name": "Prometheus + Grafana",
+      "priority": "P1",
+      "category": "可观测",
+      "knowledge": "exporter 与 scrape、PromQL、面板与变量、告警规则与分组、中间件指标接入",
+      "prereq": "SpringBoot Actuator",
+      "reqCount": 4,
+      "hours": 12,
+      "requirements": [
+        {
+          "pageType": "配置页",
+          "id": "M14-01",
+          "title": "指标暴露与采集",
+          "hours": "3h",
+          "desc": "Actuator 暴露 JVM/接口指标，Prometheus 抓取；页面展示 target 状态与最近抓取时间。",
+          "fields": "endpoint, job, target 状态",
+          "api": "GET /actuator/prometheus",
+          "edge": "target down、指标缺失",
+          "acceptance": "指标可查，target 显示 up",
+          "knowledge": "exporter、scrape"
+        },
+        {
+          "pageType": "看板",
+          "id": "M14-02",
+          "title": "Grafana 大盘",
+          "hours": "4h",
+          "desc": "QPS、RT、错误率、JVM 内存四张图，支持切时间窗与变量。",
+          "fields": "dashboard, qps, rt, err",
+          "api": "GET /api/obs/dashboard",
+          "edge": "无数据空态",
+          "acceptance": "四张图有数据且可切时间窗",
+          "knowledge": "PromQL、面板"
+        },
+        {
+          "pageType": "监控页",
+          "id": "M14-03",
+          "title": "告警规则与通知",
+          "hours": "3h",
+          "desc": "RT&gt;500ms 或错误率&gt;5% 钉到飞书，页面展示告警历史与恢复记录。",
+          "fields": "alert_rule, notify, 历史",
+          "api": "GET /api/alert/rules",
+          "edge": "通知失败、重复告警",
+          "acceptance": "人为打挂服务 1 分钟内收到告警",
+          "knowledge": "alertmanager、分组"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M14-04",
+          "title": "关键中间件指标接入",
+          "hours": "2h",
+          "desc": "Redis/Kafka/RocketMQ 指标接入同一大盘，页面展示各 target 指标项。",
+          "fields": "target, metric",
+          "api": "GET /api/obs/targets",
+          "edge": "指标缺失",
+          "acceptance": "中间件指标在同一个大盘可见",
+          "knowledge": "exporter 生态"
+        }
+      ]
+    },
+    {
+      "id": "M15",
+      "name": "SkyWalking",
+      "priority": "P1",
+      "category": "可观测",
+      "knowledge": "trace/span、采样率、拓扑与依赖、告警、慢 SQL 标签",
+      "prereq": "Nacos / Gateway",
+      "reqCount": 3,
+      "hours": 8,
+      "requirements": [
+        {
+          "pageType": "列表页",
+          "id": "M15-01",
+          "title": "链路追踪查询",
+          "hours": "3h",
+          "desc": "按 traceId 或耗时查链路，展示每段 span 耗时，慢节点标红。",
+          "fields": "trace_id, span, cost",
+          "api": "GET /api/trace/{id}",
+          "edge": "无链路、采样未命中",
+          "acceptance": "一次请求全链路可查，慢节点可见",
+          "knowledge": "trace/span、采样"
+        },
+        {
+          "pageType": "看板",
+          "id": "M15-02",
+          "title": "服务拓扑与依赖",
+          "hours": "2h",
+          "desc": "服务间调用关系图与各边 QPS/RT。",
+          "fields": "topology, qps",
+          "api": "GET /api/topology",
+          "edge": "无调用空态",
+          "acceptance": "拓扑图可见调用关系",
+          "knowledge": "拓扑、依赖分析"
+        },
+        {
+          "pageType": "详情页",
+          "id": "M15-03",
+          "title": "慢 SQL/慢接口定位",
+          "hours": "3h",
+          "desc": "标出 &gt;200ms 的节点并下钻到具体 SQL 与参数。",
+          "fields": "slow_span, sql",
+          "api": "GET /api/slow/top",
+          "edge": "无采样",
+          "acceptance": "能定位到具体慢节点与 SQL",
+          "knowledge": "span 标签、alarm"
+        }
+      ]
+    },
+    {
+      "id": "M22",
+      "name": "Filebeat",
+      "priority": "P1",
+      "category": "可观测",
+      "knowledge": "input/output、多行合并、字段解析 processor、轮转与 ILM",
+      "prereq": "ES",
+      "reqCount": 3,
+      "hours": 8,
+      "requirements": [
+        {
+          "pageType": "配置页",
+          "id": "M22-01",
+          "title": "日志采集到 ES",
+          "hours": "3h",
+          "desc": "采集 app.log 写入 ES，按 level 建索引，页面展示采集速率与最新日志。",
+          "fields": "path, index, level, 速率",
+          "api": "POST /api/log/collect",
+          "edge": "文件轮转丢日志",
+          "acceptance": "traceId 可查到全链路日志",
+          "knowledge": "input/output、多行"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M22-02",
+          "title": "多行日志与字段解析",
+          "hours": "2h",
+          "desc": "异常堆栈多行合并、JSON 字段解析，配置可在线改并热加载。",
+          "fields": "multiline, fields",
+          "api": "GET /api/log/config",
+          "edge": "解析失败",
+          "acceptance": "堆栈不被拆行",
+          "knowledge": "multiline、processor"
+        },
+        {
+          "pageType": "列表页",
+          "id": "M22-03",
+          "title": "日志检索页",
+          "hours": "3h",
+          "desc": "按 level/时间/traceId 检索，结果高亮并可展开上下文。",
+          "fields": "level, trace_id, time",
+          "api": "GET /api/log/search",
+          "edge": "无结果、范围过大",
+          "acceptance": "秒级检索到目标日志",
+          "knowledge": "索引设计、ILM"
+        }
+      ]
+    },
+    {
+      "id": "M16",
+      "name": "Seata",
+      "priority": "P1",
+      "category": "数据一致性",
+      "knowledge": "TC/TM/RM 角色、AT 模式与全局锁、TCC 三阶段与空回滚/悬挂、undo_log、最终一致对比",
+      "prereq": "Nacos + MySQL",
+      "reqCount": 4,
+      "hours": 12,
+      "requirements": [
+        {
+          "pageType": "表单页",
+          "id": "M16-01",
+          "title": "AT 模式跨服务事务",
+          "hours": "4h",
+          "desc": "发帖+加积分跨服务事务，任一步失败整体回滚；页面展示全局事务状态与回滚原因。",
+          "fields": "xid, branch, 状态",
+          "api": "POST /api/post/tx",
+          "edge": "回滚失败、分支超时",
+          "acceptance": "异常时不出现半成功，回滚可查",
+          "knowledge": "TC/TM/RM、AT"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M16-02",
+          "title": "TCC 手写补偿",
+          "hours": "4h",
+          "desc": "Try/Confirm/Cancel 三阶段，处理空回滚与悬挂，页面可触发异常分支测试。",
+          "fields": "try, confirm, cancel",
+          "api": "POST /api/tcc",
+          "edge": "重复 confirm、悬挂",
+          "acceptance": "重复/悬挂被正确处理",
+          "knowledge": "TCC、空回滚、悬挂"
+        },
+        {
+          "pageType": "详情页",
+          "id": "M16-03",
+          "title": "与 MQ 最终一致对比",
+          "hours": "2h",
+          "desc": "同场景两方案对照，列出一致性强度、性能、实现成本。",
+          "fields": "方案 A/方案 B、差异表",
+          "api": "GET /api/tx/compare",
+          "edge": "无数据",
+          "acceptance": "能说清两种方案各自代价",
+          "knowledge": "最终一致、补偿"
+        },
+        {
+          "pageType": "监控页",
+          "id": "M16-04",
+          "title": "事务日志与监控",
+          "hours": "2h",
+          "desc": "全局事务状态、回滚次数、平均耗时，异常事务高亮。",
+          "fields": "xid, status, rollback",
+          "api": "GET /api/tx/monitor",
+          "edge": "无事务空态",
+          "acceptance": "事务状态可查，异常可定位",
+          "knowledge": "undo_log"
+        }
+      ]
+    },
+    {
+      "id": "M17",
+      "name": "ShardingSphere-Proxy",
+      "priority": "P2",
+      "category": "数据一致性",
+      "knowledge": "分片键与路由、绑定表、跨分片归并、读写分离、分布式事务限制",
+      "prereq": "MySQL",
+      "reqCount": 3,
+      "hours": 9,
+      "requirements": [
+        {
+          "pageType": "配置页",
+          "id": "M17-01",
+          "title": "分库分表路由",
+          "hours": "4h",
+          "desc": "user_id 分 4 库 16 表，页面输入 userId 展示数据落到哪个库表并可直接查询。",
+          "fields": "sharding_key, actual_db, actual_table",
+          "api": "POST /api/shard/rule",
+          "edge": "无分片键走广播",
+          "acceptance": "能查到具体落库落表",
+          "knowledge": "分片键、路由"
+        },
+        {
+          "pageType": "列表页",
+          "id": "M17-02",
+          "title": "跨分片分页与排序",
+          "hours": "3h",
+          "desc": "跨 16 表分页与全局排序，结果不重复；展示各分片返回行数。",
+          "fields": "page, order, 各分片行数",
+          "api": "GET /api/shard/page",
+          "edge": "深分页性能差",
+          "acceptance": "分页结果正确无重复",
+          "knowledge": "归并、流式合并"
+        },
+        {
+          "pageType": "配置页",
+          "id": "M17-03",
+          "title": "读写分离",
+          "hours": "2h",
+          "desc": "主写从读，页面展示读请求落点与从库延迟。",
+          "fields": "master, slave, 延迟",
+          "api": "GET /api/shard/route",
+          "edge": "从库延迟过大",
+          "acceptance": "读请求落从库，延迟可见",
+          "knowledge": "读写分离、延迟"
+        }
+      ]
+    },
+    {
+      "id": "M18",
+      "name": "Milvus",
+      "priority": "P2",
+      "category": "AI 能力",
+      "knowledge": "collection 与索引、向量度量、topK 召回、RAG 提示词与引用、混合检索与重排",
+      "prereq": "ES / Embedding 模型",
+      "reqCount": 4,
+      "hours": 13,
+      "requirements": [
+        {
+          "pageType": "表单页",
+          "id": "M18-01",
+          "title": "向量入库与检索",
+          "hours": "4h",
+          "desc": "帖子切块向量化入库，输入问题返回 topK 召回与相似度分数。",
+          "fields": "collection, top_k, score",
+          "api": "POST /api/ai/search",
+          "edge": "空集合、维度不匹配",
+          "acceptance": "召回结果相关性可对比",
+          "knowledge": "collection、索引、度量"
+        },
+        {
+          "pageType": "详情页",
+          "id": "M18-02",
+          "title": "RAG 问答带引用",
+          "hours": "4h",
+          "desc": "召回后拼 prompt 生成答案，答案下方标注引用原文与相似度。",
+          "fields": "question, answer, citation",
+          "api": "POST /api/ai/chat",
+          "edge": "无召回拒答、答非所问",
+          "acceptance": "回答带原文引用且可点开",
+          "knowledge": "RAG、引用"
+        },
+        {
+          "pageType": "看板",
+          "id": "M18-03",
+          "title": "相似帖推荐",
+          "hours": "3h",
+          "desc": "详情页底部相似帖列表，展示相似度并支持「不感兴趣」反馈。",
+          "fields": "post_id, similar, score",
+          "api": "GET /api/ai/similar",
+          "edge": "无相似空态",
+          "acceptance": "推荐列表可解释",
+          "knowledge": "向量相似、重排"
+        },
+        {
+          "pageType": "详情页",
+          "id": "M18-04",
+          "title": "向量与关键词检索对比",
+          "hours": "2h",
+          "desc": "同一问题两种召回结果并排，标注哪些只有一方命中。",
+          "fields": "kw_result, vec_result",
+          "api": "GET /api/ai/compare",
+          "edge": "单侧失败",
+          "acceptance": "能看出两路召回差异",
+          "knowledge": "混合检索"
+        }
+      ]
+    }
+  ]
+}
